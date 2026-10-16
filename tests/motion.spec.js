@@ -98,6 +98,13 @@ test("3D pointer tilt resets on leave and respects reduced motion", async ({ pag
   await page.goto("./solutions/");
   const board = page.locator("#workflow-customer");
   await expect(board).toBeVisible();
+  await board.scrollIntoViewIfNeeded();
+  await page.evaluate(async () => {
+    // Let entrance/reveal layout settle before checking pointer tilt in Firefox.
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await Promise.allSettled(document.getAnimations().map(animation => animation.finished));
+    await new Promise(resolve => requestAnimationFrame(resolve));
+  });
   await board.hover({ position: { x: 60, y: 100 } });
   await expect(board).toHaveClass(/is-tilting/);
   const tilt = await board.evaluate(element => ({ x: element.style.getPropertyValue("--tilt-x"), y: element.style.getPropertyValue("--tilt-y") }));
