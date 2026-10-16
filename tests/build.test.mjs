@@ -61,6 +61,21 @@ for (const basePath of ["", "/A-MTechSolution"]) {
     assert.match(await notFound.text(), /<h1>404<\/h1>/);
     assert.equal((await fetch(`${url}src/missing.js`)).status, 404);
     assert.equal((await fetch(`${url}site-config.js`)).headers.get("content-type"), "text/javascript; charset=utf-8");
+    const media = await readFile(resolve(output, "media/studio-sculpture-v1.mp4"));
+    const mediaUrl = `${url}media/studio-sculpture-v1.mp4`;
+    const mediaHead = await fetch(mediaUrl, { method: "HEAD" });
+    assert.equal(mediaHead.headers.get("content-type"), "video/mp4");
+    assert.equal(Number(mediaHead.headers.get("content-length")), media.length);
+    assert.equal(mediaHead.headers.get("accept-ranges"), "bytes");
+    for (const [range, start, end] of [["bytes=0-31", 0, 31], ["bytes=-16", media.length - 16, media.length - 1], [`bytes=${media.length - 16}-`, media.length - 16, media.length - 1]]) {
+      const partial = await fetch(mediaUrl, { headers: { Range: range } });
+      assert.equal(partial.status, 206);
+      assert.equal(partial.headers.get("content-range"), `bytes ${start}-${end}/${media.length}`);
+      assert.deepEqual(Buffer.from(await partial.arrayBuffer()), media.subarray(start, end + 1));
+    }
+    const invalidRange = await fetch(mediaUrl, { headers: { Range: `bytes=${media.length}-` } });
+    assert.equal(invalidRange.status, 416);
+    assert.equal(invalidRange.headers.get("content-range"), `bytes */${media.length}`);
     const redirect = await fetch(`${url}services?campaign=test`, { redirect: "manual" });
     assert.equal(redirect.status, 308);
     assert.equal(redirect.headers.get("location"), `${basePath}/services/?campaign=test`);

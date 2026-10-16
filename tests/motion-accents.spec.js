@@ -11,9 +11,11 @@ test("desktop illustration plays, pauses by keyboard, ends and replays", async (
   await scene.scrollIntoViewIfNeeded();
   await expect(scene).toHaveClass(/has-motion-media/);
   await expect.poll(() => video.evaluate(v => v.currentTime > 0), { timeout: 10000 }).toBe(true);
-  // A slow browser startup can finish the short autoplay before this assertion.
-  if (await video.evaluate(v => v.paused)) await control.click();
+  // Start keyboard checks from a completed clip, avoiding an end/pause race.
+  await expect(control).toHaveAccessibleName("Replay illustration", { timeout: 12000 });
   await control.focus();
+  await page.keyboard.press("Enter");
+  await expect(control).toHaveAccessibleName("Pause illustration");
   await page.keyboard.press("Enter");
   await expect(control).toHaveAccessibleName("Play illustration");
   expect(await video.evaluate(v => v.paused)).toBe(true);

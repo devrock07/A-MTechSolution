@@ -10,8 +10,8 @@ export async function createPreviewServer({ directory = defaultRoot, port = 4173
   const root = resolve(directory);
   const { basePath } = JSON.parse(await readFile(resolve(root, "build-info.json"), "utf8"));
   const server = createServer(async (request, response) => {
-    const send = (status, body, type = "text/plain; charset=utf-8") => {
-      response.writeHead(status, { "Content-Type": type, "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "strict-origin-when-cross-origin" });
+    const send = (status, body, type = "text/plain; charset=utf-8", headers = {}) => {
+      response.writeHead(status, { "Content-Type": type, "Content-Length": Buffer.byteLength(body), "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "strict-origin-when-cross-origin", ...headers });
       response.end(request.method === "HEAD" ? undefined : body);
     };
     try {
@@ -28,7 +28,22 @@ export async function createPreviewServer({ directory = defaultRoot, port = 4173
           if (!path.endsWith("/")) { response.writeHead(308, { Location: `${url.pathname}/${url.search}` }); response.end(); return; }
           file = resolve(file, "index.html");
         }
-        send(200, await readFile(file), types[extname(file)] || "application/octet-stream");
+        const body = await readFile(file);
+        const type = types[extname(file)] || "application/octet-stream";
+        if (extname(file) === ".mp4") {
+          // Media engines seek with byte ranges, including when resuming playback.
+          const headers = { "Accept-Ranges": "bytes" };
+          const range = request.method === "GET" && /^bytes=(\d*)-(\d*)$/.exec(request.headers.range || "");
+          if (range && (range[1] || range[2])) {
+            const start = range[1] ? Number(range[1]) : Math.max(0, body.length - Number(range[2]));
+            const end = range[1] && range[2] ? Math.min(Number(range[2]), body.length - 1) : body.length - 1;
+            if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start > end || start >= body.length) {
+              send(416, "", type, { ...headers, "Content-Range": `bytes */${body.length}` });
+            } else {
+              send(206, body.subarray(start, end + 1), type, { ...headers, "Content-Range": `bytes ${start}-${end}/${body.length}` });
+            }
+          } else send(200, body, type, headers);
+        } else send(200, body, type);
       } catch (error) {
         if (!["ENOENT", "ENOTDIR"].includes(error.code)) throw error;
         send(404, await readFile(resolve(root, "404.html")), "text/html; charset=utf-8");

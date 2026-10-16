@@ -74,7 +74,9 @@ export function setupMotionAccents() {
       if (video.paused || video.ended) {
         state.paused = false;
         if (video.ended) video.currentTime = 0;
-        update(state);
+        // Seeking can leave `ended` true until the next media event. An explicit
+        // replay must call play directly instead of passing the autoplay guard.
+        video.play().catch(() => label(state));
       } else {
         state.paused = true;
         video.pause();
