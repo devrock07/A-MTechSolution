@@ -15,11 +15,14 @@
   --max: 90rem;
   --gutter: clamp(1.1rem, 4vw, 4.5rem);
   --section: clamp(5.5rem, 11vw, 10rem);
-  --reveal-duration: 550ms;
-  --reveal-stagger: 70ms;
+  --reveal-duration: 420ms;
+  --reveal-stagger: 45ms;
   --entrance-duration: 720ms;
   --arrival-duration: 300ms;
-  --tilt-reset-duration: 320ms;
+  --tilt-reset-duration: 600ms;
+  --ambient-duration: 12000ms;
+  --ambient-distance: 6px;
+  --ambient-angle: 1.5deg;
   --workflow-switch-duration: 280ms;
   --workflow-depth-step: 12px;
   --sans: "Inter", "Aptos", "Segoe UI Variable", "Segoe UI", sans-serif;
@@ -57,21 +60,42 @@ img, svg { display: block; max-width: 100%; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .brand-entrance { display: none; }
 html[data-entrance] .brand-entrance {
-  position: fixed; z-index: 900; inset: 0; display: grid; grid-template-rows: auto 1fr auto;
-  overflow: hidden; background: var(--ink); color: var(--white); pointer-events: none;
-  animation: brand-arrival var(--arrival-duration) cubic-bezier(.76,0,.24,1) both;
+  position: fixed; z-index: 101; inset: 0 0 auto; height: 2px; display: block;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent); pointer-events: none;
+  transform-origin: left;
+  animation: brand-arrival var(--arrival-duration) ease-out both;
 }
-html[data-entrance="intro"] .brand-entrance { animation: brand-intro var(--entrance-duration) cubic-bezier(.76,0,.24,1) both; }
-.brand-entrance::before { content: ""; position: absolute; inset: 0; opacity: .08; background-image: linear-gradient(var(--white) 1px, transparent 1px), linear-gradient(90deg, var(--white) 1px, transparent 1px); background-size: 5rem 5rem; }
-.entrance-rail { position: relative; display: flex; justify-content: space-between; gap: 1rem; padding: 1.3rem var(--gutter); font: 500 .65rem/1.5 var(--mono); text-transform: uppercase; letter-spacing: .06em; border-block: 1px solid #343630; }
-.entrance-rail:last-child { background: var(--accent); color: var(--ink); }
-.entrance-wordmark { position: relative; display: flex; align-items: center; justify-content: center; font-size: clamp(7rem, 29vw, 26rem); font-weight: 600; line-height: .8; letter-spacing: -.1em; }
-.entrance-wordmark em { color: var(--accent); font-family: Georgia, serif; font-weight: 400; font-size: .48em; margin: 0 .2em 0 .12em; }
-html[data-entrance="intro"] .entrance-wordmark { animation: wordmark-enter 440ms cubic-bezier(.16,1,.3,1) both; }
-html[data-entrance="arrival"] .entrance-wordmark { font-size: clamp(5rem, 13vw, 10rem); }
-@keyframes brand-intro { 0%, 35% { transform: translateY(0); visibility: visible; } 100% { transform: translateY(-100%); visibility: hidden; } }
-@keyframes brand-arrival { from { transform: translateY(0); visibility: visible; } to { transform: translateY(-100%); visibility: hidden; } }
-@keyframes wordmark-enter { from { opacity: 0; transform: translateY(2rem) scale(.97); } to { opacity: 1; transform: none; } }
+html[data-entrance="intro"] .brand-entrance { animation: brand-intro var(--entrance-duration) ease-out both; }
+@keyframes brand-intro { from { transform: scaleX(.15); opacity: .7; visibility: visible; } to { transform: scaleX(1); opacity: 0; visibility: hidden; } }
+@keyframes brand-arrival { from { transform: scaleX(.4); opacity: .5; visibility: visible; } to { transform: scaleX(1); opacity: 0; visibility: hidden; } }
+
+.motion-toggle { flex: none; width: 44px; height: 44px; margin-left: auto; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; }
+.motion-toggle:hover { background: #e3ebd6; }
+.motion-toggle:disabled { cursor: default; }
+.motion-toggle > span { display: block; font-size: 1.1rem; line-height: 1; }
+
+/* Slow, closed loops keep position and velocity continuous at each repeat. */
+.motion-ready [data-drift] { animation: ambient-scene var(--ambient-duration) ease-in-out infinite; animation-play-state: paused; }
+.motion-ready [data-drift="object"] { animation-name: ambient-object; animation-duration: calc(var(--ambient-duration) * 1.2); }
+.motion-ready [data-drift="layer"] { animation-name: ambient-layer; animation-duration: calc(var(--ambient-duration) * .85); }
+.motion-ready [data-motion-active] { animation-play-state: running; }
+.motion-ready[data-motion-paused] [data-drift], .motion-ready[data-motion-suspended] [data-drift],
+.motion-ready [data-drift]:focus-within { animation-play-state: paused; }
+@keyframes ambient-scene {
+  0%, 100% { translate: 0 0; rotate: y 0deg; }
+  25% { translate: 0 calc(var(--ambient-distance) * -.65); rotate: y var(--ambient-angle); }
+  75% { translate: 0 calc(var(--ambient-distance) * .35); rotate: y calc(var(--ambient-angle) * -1); }
+}
+@keyframes ambient-object {
+  0%, 100% { translate: 0 0; rotate: z 0deg; }
+  25% { translate: 0 calc(var(--ambient-distance) * -1); rotate: z calc(var(--ambient-angle) * 2); }
+  75% { translate: 0 calc(var(--ambient-distance) * .5); rotate: z calc(var(--ambient-angle) * -1); }
+}
+@keyframes ambient-layer {
+  0%, 100% { translate: 0 0; }
+  25% { translate: 0 calc(var(--ambient-distance) * -.4); }
+  75% { translate: 0 calc(var(--ambient-distance) * .25); }
+}
 
 .skip-link {
   position: fixed;
@@ -367,7 +391,7 @@ html[data-entrance="arrival"] .entrance-wordmark { font-size: clamp(5rem, 13vw, 
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   [data-tilt] { transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); transition: transform var(--tilt-reset-duration) ease, border-color 180ms ease; }
   .workflow-board[data-tilt] { transform: rotateX(calc(4deg + var(--tilt-x, 0deg))) rotateY(calc(-5deg + var(--tilt-y, 0deg))); }
-  [data-tilt].is-tilting { transition-duration: 100ms; }
+  [data-tilt].is-tilting { transition-duration: 180ms; }
   .solution-card:hover { border-color: #889c63; }
 }
 
@@ -539,7 +563,6 @@ html[data-entrance="arrival"] .entrance-wordmark { font-size: clamp(5rem, 13vw, 
 }
 
 @media (max-width: 680px) {
-  .entrance-rail > :last-child { display: none; }
   .solutions-intro h1 { font-size: clamp(3.15rem, 14vw, 5.5rem); }
   .preview-label { flex-wrap: wrap; margin-bottom: 1.2rem; }
   .preview-label .page-code { font-size: .6rem; }
@@ -594,6 +617,7 @@ html[data-entrance="arrival"] .entrance-wordmark { font-size: clamp(5rem, 13vw, 
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .motion-ready [data-drift] { animation: none !important; translate: none; rotate: none; }
   html[data-entrance] .brand-entrance { display: none; }
   [data-tilt], .workflow-steps li { transform: none !important; }
   html { scroll-behavior: auto; }

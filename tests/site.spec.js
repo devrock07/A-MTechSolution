@@ -11,7 +11,7 @@ for (const route of routes) {
     const response = await page.goto(`.${route.path}`);
     expect(response.status()).toBe(200);
     await expect(page.locator("h1")).toHaveCount(1);
-    await expect(page.locator("html")).toHaveClass("js");
+    await expect(page.locator("html")).toHaveClass(/\bjs\b/);
     const wrongLinks = await page.locator('a[href^="/"]').evaluateAll(links => links.filter(link => !link.pathname.startsWith("/A-MTechSolution/")).map(link => link.href));
     expect(wrongLinks).toEqual([]);
     const url = `http://127.0.0.1:4300/A-MTechSolution${route.path}`;
@@ -26,7 +26,7 @@ for (const route of routes) {
       if (testInfo.project.name === "chromium" && (width === 390 || width === 1440)) {
         await page.evaluate(async () => {
           await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-          await Promise.allSettled(document.getAnimations().map(animation => animation.finished));
+          await Promise.allSettled(document.getAnimations().filter(animation => animation.effect.getTiming().iterations !== Infinity).map(animation => animation.finished));
         });
         const results = await new AxeBuilder({ page }).analyze();
         expect(results.violations.map(({ id, nodes }) => ({ id, targets: nodes.map(node => node.target) })), `Accessibility at ${width}px`).toEqual([]);

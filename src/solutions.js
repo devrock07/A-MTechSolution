@@ -16,7 +16,7 @@ function setupPreview(preview) {
     panels.forEach(panel => { panel.hidden = panel.id !== id; });
     const current = panels.find(panel => !panel.hidden);
     if (announce) status.textContent = `${current.querySelector("h2").textContent} Preview shown.`;
-    if (announce && !reduced.matches && current.animate) {
+    if (announce && !reduced.matches && !document.documentElement.hasAttribute("data-motion-paused") && current.animate) {
       transition = current.querySelector(".workflow-steps").animate([
         { opacity: 0.2, transform: "translateY(10px)" },
         { opacity: 1, transform: "translateY(0)" }
@@ -25,6 +25,7 @@ function setupPreview(preview) {
   }
   buttons.forEach(button => button.addEventListener("click", () => select(button.dataset.workflowSelect, true)));
   reduced.addEventListener("change", () => { if (reduced.matches) transition?.cancel(); });
+  document.addEventListener("motionpreferencechange", () => transition?.cancel());
   select(buttons[0].dataset.workflowSelect);
   preview.classList.add("workflow-enhanced");
 }

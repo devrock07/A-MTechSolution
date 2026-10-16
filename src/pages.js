@@ -36,6 +36,7 @@ function header(path) {
     <header class="site-header">
       <div class="nav-wrap">
         ${link("/", `<span class="brand-mark" aria-hidden="true">A&M</span><span class="brand-text">A&M Tech Solutions</span>`, "brand")}
+        <button class="motion-toggle" type="button" aria-label="Pause motion" title="Pause motion" hidden><span aria-hidden="true">Ⅱ</span></button>
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open menu"><span></span></button>
         <nav id="primary-navigation" class="nav-links" aria-label="Primary navigation">
           ${navigation.map(([label, href]) => `<a class="nav-link" href="${sitePath(href)}" ${path.startsWith(href) ? 'aria-current="page"' : ""}>${label}</a>`).join("")}
