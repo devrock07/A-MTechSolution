@@ -48,6 +48,9 @@ for (const basePath of ["", "/A-MTechSolution"]) {
     const app = await readFile(resolve(output, "src/app.js"), "utf8");
     assert.match(app, /site-config\.js\?v=/);
     assert.match(app, /contact\.js\?v=/);
+    assert.match(app, /motion\.js\?v=/);
+    assert.match(app, /solutions\.js\?v=/);
+    for (const file of ["motion.js", "solutions.js"]) assert.ok((await stat(resolve(output, "src", file))).isFile());
 
     const { server, url } = await createPreviewServer({ directory: output, port: 0 });
     t.after(() => new Promise(accept => server.close(accept)));

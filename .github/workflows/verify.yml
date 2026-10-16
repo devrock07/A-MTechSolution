@@ -39,4 +39,5 @@ jobs:
             test-results/
             qa-artifacts/*-home-*.png
             qa-artifacts/*-contact-*.png
+            qa-artifacts/*-solutions-*.png
           retention-days: 7

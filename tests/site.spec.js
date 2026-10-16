@@ -24,6 +24,10 @@ for (const route of routes) {
       expect(dimensions.document, `${route.path} overflow at ${width}px`).toBeLessThanOrEqual(dimensions.viewport);
       await expect(page.locator(".brand").first()).toHaveAccessibleName("A&M Tech Solutions");
       if (testInfo.project.name === "chromium" && (width === 390 || width === 1440)) {
+        await page.evaluate(async () => {
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          await Promise.allSettled(document.getAnimations().map(animation => animation.finished));
+        });
         const results = await new AxeBuilder({ page }).analyze();
         expect(results.violations.map(({ id, nodes }) => ({ id, targets: nodes.map(node => node.target) })), `Accessibility at ${width}px`).toEqual([]);
       }
@@ -130,6 +134,8 @@ test("reduced motion still exposes content immediately without loading overlays"
   await page.goto("./");
   await expect(page.locator("h1")).toBeVisible();
   await expect(page.locator("#site-loader, #route-curtain")).toHaveCount(0);
+  await expect(page.locator(".brand-entrance")).toBeHidden();
+  expect(await page.locator(".reveal").evaluateAll(elements => elements.every(element => getComputedStyle(element).opacity === "1"))).toBe(true);
   await expect(page.locator("body")).not.toHaveCSS("overflow-y", "hidden");
 });
 
@@ -142,13 +148,20 @@ test("root deployment uses root-relative links and email fallback", async ({ pag
 
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
-  for (const path of ["/", "/services/crm-development/", "/contact/", "/legal/privacy-policy/"]) {
+  for (const path of ["/", "/solutions/", "/services/crm-development/", "/contact/", "/legal/privacy-policy/"]) {
     test(`${path} still has visible content and usable navigation`, async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(`.${path}`);
       await expect(page.locator("h1")).toBeVisible();
       await expect(page.locator("#primary-navigation")).toBeVisible();
       await expect(page.locator(".menu-toggle")).toBeHidden();
+      await expect(page.locator(".brand-entrance")).toBeHidden();
+      if (path === "/solutions/") {
+        await expect(page.locator("[data-workflow-panel]:visible")).toHaveCount(3);
+        await expect(page.locator(".workflow-controls")).toBeHidden();
+        await page.locator(".solution-approach summary").first().click();
+        await expect(page.locator(".solution-service-link").first()).toBeVisible();
+      }
       if (path.includes("crm-development")) {
         const faq = page.locator(".faq-item").nth(1);
         await faq.locator("summary").click();
@@ -168,9 +181,11 @@ test("visual checkpoints", async ({ page }, testInfo) => {
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("./");
-    await page.screenshot({ path: `qa-artifacts/${testInfo.project.name}-home-${width}.png` });
+    await page.screenshot({ path: `qa-artifacts/${testInfo.project.name}-home-${width}.png`, animations: "disabled" });
     await page.goto("./contact/");
     await page.locator("#project-form").scrollIntoViewIfNeeded();
     await page.screenshot({ path: `qa-artifacts/${testInfo.project.name}-contact-${width}.png` });
+    await page.goto("./solutions/");
+    await page.screenshot({ path: `qa-artifacts/${testInfo.project.name}-solutions-${width}.png`, animations: "disabled" });
   }
 });

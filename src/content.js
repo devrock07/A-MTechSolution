@@ -161,6 +161,34 @@ export const solutions = [
   { icon: "＋", title: "Growing companies", problem: "Independent tools no longer provide a trustworthy picture of the business.", solution: "Build or integrate the systems that need to share context—without replacing useful tools just for the sake of it." }
 ];
 
+// Illustrative workflows, not live product data or promised client results.
+export const workflowPreviews = [
+  { id: "customer", label: "Customer flow", title: "From hello to handoff.", caption: "Give every enquiry a clear next step.", steps: [
+    ["Capture the enquiry", "Website, email, or customer portal", "Capture"],
+    ["Keep the context", "One record, a clear owner, the next action", "Connect"],
+    ["Move the work forward", "Follow-up, proposal, and delivery handoff", "Act"]
+  ] },
+  { id: "operations", label: "Daily operations", title: "Keep the work connected.", caption: "Make responsibilities and handoffs visible.", steps: [
+    ["Bring work into view", "Jobs, stock, requests, and schedules", "Capture"],
+    ["Coordinate the team", "Roles, approvals, and shared context", "Connect"],
+    ["Know what needs attention", "Exceptions, progress, and next actions", "Act"]
+  ] },
+  { id: "growth", label: "A first release", title: "Start small. Learn quickly.", caption: "Turn the essential journey into a useful first version.", steps: [
+    ["Find the core journey", "The user, the problem, and the useful outcome", "Discover"],
+    ["Shape the first version", "A focused website, portal, or application", "Build"],
+    ["Learn from real use", "Feedback that guides the next improvement", "Improve"]
+  ] }
+];
+
+export const solutionServices = [
+  ["website-development", "web-application-development"],
+  ["custom-software-automation", "crm-development"],
+  ["erp-business-systems", "custom-software-automation"],
+  ["web-application-development", "erp-business-systems"],
+  ["crm-development", "website-development"],
+  ["custom-software-automation", "erp-business-systems"]
+];
+
 export const process = [
   ["01", "Discover", "Understand the business, the people involved, and the problem worth solving."],
   ["02", "Plan", "Define scope, workflows, priorities, constraints, and a delivery roadmap."],

@@ -1,5 +1,7 @@
 import config from "../site-config.js";
 import { setupProjectForm } from "./contact.js";
+import { setupMotion } from "./motion.js";
+import { setupWorkflowPreview } from "./solutions.js";
 
 const toggle = document.querySelector(".menu-toggle");
 const nav = document.querySelector("#primary-navigation");
@@ -44,3 +46,5 @@ window.addEventListener("pagehide", () => setMenu(false));
 const form = document.querySelector("#project-form");
 if (form) setupProjectForm(form, config);
 document.documentElement.classList.add("js");
+setupWorkflowPreview();
+setupMotion();

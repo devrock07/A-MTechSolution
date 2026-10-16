@@ -5,9 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f2f1ea" />
     <!-- page:head -->
+    <script>
+      // Decorative only: CSS completes the entrance even if the app cannot load.
+      try {
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches && performance.getEntriesByType("navigation")[0]?.type !== "back_forward") {
+          document.documentElement.dataset.entrance = sessionStorage.getItem("am-entrance") ? "arrival" : "intro";
+          sessionStorage.setItem("am-entrance", "seen");
+        }
+      } catch { /* Storage is optional; the page remains fully visible. */ }
+    </script>
   </head>
   <body>
     <a class="skip-link" href="#main-content" tabindex="0">Skip to content</a>
+    <div class="brand-entrance" aria-hidden="true" inert>
+      <div class="entrance-rail"><span>A&amp;M / Digital studio</span><span>Made to move you forward</span></div>
+      <div class="entrance-wordmark"><span>A</span><em>&amp;</em><span>M</span></div>
+      <div class="entrance-rail"><span>Websites / Systems / Software</span><span>Let's make it work ↗</span></div>
+    </div>
     <!-- page:content -->
     <!-- page:scripts -->
   </body>

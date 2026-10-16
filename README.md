@@ -1,6 +1,6 @@
 # A&M Tech Solutions
 
-A static website for websites, customer tools, and workflow automation. All 23 pages are rendered to HTML during the build. Navigation and FAQs work without JavaScript; the small browser module enhances the mobile menu and project planner. No framework or third-party runtime is shipped to visitors.
+A static website for websites, customer tools, and workflow automation. All 23 pages are rendered to HTML during the build. Navigation, FAQs, and solution cards work without JavaScript; small browser modules enhance the mobile menu, project planner, workflow preview, and motion. No framework or third-party runtime is shipped to visitors.
 
 ## Local preview
 
@@ -40,12 +40,33 @@ The browser suite starts its own three local fixtures on ports 4300–4302. Form
 | `src/pages.js` | HTML templates, layout, and project planner |
 | `src/app.js` | Progressive mobile menu behavior |
 | `src/contact.js` | Form validation, copying, and bounded delivery requests |
+| `src/motion.js` | Scroll reveals, entrance cleanup, and pointer-driven 3D tilt |
+| `src/solutions.js` | Accessible workflow selection and panel transitions |
 | `src/styles.css` | Responsive presentation and accessible color tokens |
 | `scripts/build.mjs` | Static rendering, canonical metadata, asset versions, and sitemap |
 
 Business/contact placeholders are intentionally retained for completion later. The homepage emphasizes available service categories. Work, product, and legal drafts remain accessible at their original URLs for editing/review, but are marked `noindex, follow` and excluded from the public navigation and sitemap by default. `noindex` is not access control; preview content is still public.
 
 Complete and approve the relevant content before enabling `publishWork`, `publishProducts`, or `publishLegal`. The case-study template and unreleased product concept remain unindexed until their explicit draft status in `src/routes.js` is changed. Publishing legal pages also requires the entity, jurisdiction, effective date, and verified contact email. Replace the draft text with reviewed content first; the flag does not approve it.
+
+## Solutions design and motion
+
+The Solutions page keeps the cream, charcoal, and lime brand palette with a layered 3D workflow illustration, three selectable journeys, six expandable solution cards, linked service suggestions, and a three-step starting guide. The illustration is editable HTML/CSS, with no downloaded 3D models, video assets, or canvas library. All workflow examples are clearly marked as illustrative.
+
+The A&M brand entrance plays once per tab session; subsequent pages have a short arrival curtain. Both are decorative, never lock scrolling or delay navigation, and are dismissed immediately by input. CSS completes the entrance even if the app script fails. Scroll reveals play once, with content visible by default when JavaScript or motion APIs are unavailable. Without JavaScript, all three workflow examples remain readable and the solution-card disclosures still work.
+
+| Customize | Where |
+| --- | --- |
+| Main colors | `:root` tokens `--paper`, `--ink`, `--accent`, `--accent-dark` in `src/styles.css`; matching surface shades are in the Solutions CSS block |
+| Reveal timing | `--reveal-duration` and `--reveal-stagger` (milliseconds or seconds) |
+| Entrance and page arrival | `--entrance-duration` and `--arrival-duration` |
+| Workflow switching and tilt return | `--workflow-switch-duration` and `--tilt-reset-duration` |
+| 3D depth | `--workflow-depth-step`; board perspective and resting angles in the Solutions CSS block |
+| Tilt strength | `data-tilt="5"` on workflow boards and `data-tilt="3"` on solution cards in `src/pages.js` (maximum degrees per axis) |
+| Workflow text and suggested services | `workflowPreviews` and `solutionServices` in `src/content.js` |
+| Layout, badges, and illustration layers | `solutionsPage()` in `src/pages.js` |
+
+Motion targets smooth rendering through transform/opacity animation and event-driven `requestAnimationFrame` updates. Tilt has no idle render loop, reads bounds on entry rather than every pointer move, and runs only for a fine mouse pointer. Touch users get the same controls without pointer tilt. The operating system's reduced-motion preference disables entrances, reveals, tilt, and animated workflow switching, including when the preference changes while the page is open. Frame rate depends on the device and browser; 60fps is a design target, not a universal guarantee.
 
 ## Contact delivery
 

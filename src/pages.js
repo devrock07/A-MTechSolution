@@ -1,4 +1,4 @@
-import { company, services, solutions, process, productCategories, legalPages, navItems } from "./content.js";
+import { company, services, solutions, workflowPreviews, solutionServices, process, productCategories, legalPages, navItems } from "./content.js";
 import { escapeHtml, sitePath as joinSitePath } from "./site.js";
 import { getRoute, isPublished } from "./routes.js";
 
@@ -160,9 +160,45 @@ function serviceDetailPage(service) {
 }
 
 function solutionsPage() {
-  return `${pageHero({ label: "Solutions", title: "Start with the business friction.", intro: "The same category of software can mean very different things in different companies. We make the workflow, constraints, and desired change concrete first." })}
-    <section class="section section-dark"><div class="shell"><div class="solutions-grid">${solutions.map((item) => `<article class="solution reveal"><div class="solution-icon">${item.icon}</div><h2>${item.title}</h2><p><strong>What tends to hurt</strong><br />${item.problem}</p><p><strong>A useful direction</strong><br />${item.solution}</p></article>`).join("")}</div></div></section>
-    <section class="section"><div class="shell two-col"><div>${eyebrow("What happens next")}<h2 class="section-title small">One problem. A practical first move.</h2></div><div class="prose"><p>You do not need a perfect specification to begin. A useful conversation can identify the key actors, records, decisions, bottlenecks, and operating constraints.</p><p>From there, we can recommend a discovery phase, a focused build, an integration, or a smaller improvement than you originally expected.</p>${button("/contact/", "Describe your workflow")}</div></div></section>${finalCta()}`;
+  return `<section class="hero solutions-hero"><div class="shell solutions-hero-grid">
+    <div class="solutions-intro reveal">${eyebrow("Solutions / Built around you")}
+      <h1>Less friction.<br />More <em>flow.</em></h1>
+      <p class="hero-copy">Bring your customers, team, and everyday work into a clearer rhythm. Useful software starts with understanding what gets in your way.</p>
+      <div class="button-row">${link("#solution-types", "Find your starting point", "button")}${button("/contact/", "Plan a Project", "button-ghost")}</div>
+      <div class="solution-promises"><span><i aria-hidden="true">↗</i> Clear next steps</span><span><i aria-hidden="true">◇</i> Made for your workflow</span></div>
+    </div>
+    <div class="workflow-preview reveal" data-workflow-preview>
+      <div class="preview-label"><span class="page-code">The connected workflow</span><span class="preview-badge">Illustrative preview</span></div>
+      <div class="workflow-scene">
+        <div class="workflow-halo" aria-hidden="true"></div>
+        ${workflowPreviews.map((workflow, index) => `<section class="workflow-board" id="workflow-${workflow.id}" data-workflow-panel data-tilt="5" aria-labelledby="workflow-title-${workflow.id}">
+          <div class="workflow-board-top"><span class="workflow-mark" aria-hidden="true">A&M</span><span class="page-code">Workflow ${String(index + 1).padStart(2, "0")} / 03</span><span class="workflow-signal" aria-hidden="true"></span></div>
+          <h2 id="workflow-title-${workflow.id}">${workflow.title}</h2><p class="workflow-caption">${workflow.caption}</p>
+          <ol class="workflow-steps">${workflow.steps.map(([title, detail, label], step) => `<li style="--step:${step}"><span class="workflow-step-number" aria-hidden="true">0${step + 1}</span><div><span class="workflow-step-label">${label}</span><h3>${title}</h3><p>${detail}</p></div><span class="workflow-step-arrow" aria-hidden="true">↗</span></li>`).join("")}</ol>
+          <div class="workflow-board-bottom"><span>One shared direction</span><span aria-hidden="true">◎</span></div>
+        </section>`).join("")}
+      </div>
+      <div class="workflow-controls" role="group" aria-label="Explore a workflow">${workflowPreviews.map((workflow, index) => `<button type="button" data-workflow-select="workflow-${workflow.id}" aria-controls="workflow-${workflow.id}" aria-pressed="${index === 0}">${workflow.label}</button>`).join("")}</div>
+      <p class="sr-only" data-workflow-status role="status" aria-live="polite"></p>
+    </div>
+  </div></section>
+  <section class="section section-dark solution-directory" id="solution-types"><div class="shell">
+    <div class="section-heading-row reveal"><div>${eyebrow("Find your starting point")}<h2 class="section-title small">Your business.<br />Your way forward.</h2></div><p class="section-lede">Different teams need different tools. Explore an approach that fits the work you actually do.</p></div>
+    <div class="solution-card-grid">${solutions.map((item, index) => `<div class="reveal"><article class="solution-card" data-tilt="3">
+      <div class="solution-card-top"><span class="solution-card-icon" aria-hidden="true">${item.icon}</span><span class="page-code">0${index + 1} / Solution</span></div>
+      <h3>${item.title}</h3><p>${item.problem}</p>
+      <details class="solution-approach"><summary>Explore approach <span aria-hidden="true">+</span></summary><div class="solution-approach-body"><p>${item.solution}</p><h4>A possible starting point</h4><div class="solution-service-links">${solutionServices[index].map(slug => link(`/services/${slug}/`, serviceBySlug[slug].title, "solution-service-link")).join("")}</div></div></details>
+    </article></div>`).join("")}</div>
+  </div></section>
+  <section class="section solution-next"><div class="shell">
+    <div class="section-heading-row reveal"><div>${eyebrow("From here to useful")}<h2 class="section-title small">One problem.<br />A practical first move.</h2></div><p class="section-lede">You don't need a perfect specification. A clear conversation is enough to find a sensible place to start.</p></div>
+    <ol class="starting-steps">${[
+      ["Map the friction", "Identify the people, information, and decisions that keep getting stuck."],
+      ["Choose the useful change", "A focused build, an integration, or a simpler way to use what you already have."],
+      ["Make it work together", "Shape the scope, test the flow, and give the team a clear next step."]
+    ].map(([title, copy], index) => `<li class="reveal"><span class="starting-number">0${index + 1}</span><h3>${title}</h3><p>${copy}</p></li>`).join("")}</ol>
+    <div class="button-row">${button("/contact/", "Describe your workflow")}</div>
+  </div></section>${finalCta()}`;
 }
 
 function workPage() {
