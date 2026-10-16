@@ -61,6 +61,11 @@ export function setupMotionAccents() {
       element.classList.add("has-motion-media");
     });
     video.addEventListener("error", () => { state.failed = true; unload(state); });
+    // Some WebKit media backends pause after the native loop seeks to zero.
+    // Resume through the same visibility/device checks, never in a hidden tab.
+    video.addEventListener("seeked", () => {
+      if (video.loop && video.paused && video.currentTime < 0.1) update(state);
+    });
     observer.observe(element);
   });
 

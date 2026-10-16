@@ -12,12 +12,20 @@ test("desktop illustration loops without controls and respects reduced motion", 
   await expect.poll(() => video.evaluate(v => v.currentTime > 0), { timeout: 10000 }).toBe(true);
   await expect(scene.locator("button")).toHaveCount(0);
   expect(await video.evaluate(v => v.controls)).toBe(false);
-  // Cross the real media boundary twice: a loop must restart without a click.
-  for (let cycle = 0; cycle < 2; cycle++) {
-    await video.evaluate(v => { v.currentTime = v.duration - 0.3; });
-    await expect.poll(() => video.evaluate(v => v.currentTime < 1 && !v.paused && !v.ended)).toBe(true);
-    await expect.poll(() => video.evaluate(v => v.currentTime > 1)).toBe(true);
-  }
+  // Observe two complete natural cycles. Persist the boundary events so a busy
+  // browser cannot make the assertion miss a short currentTime < 1 window.
+  await video.evaluate(v => {
+    v.observedLoops = 0;
+    let previousTime = v.currentTime;
+    const observe = () => {
+      if (previousTime - v.currentTime > 1) v.observedLoops++;
+      previousTime = v.currentTime;
+    };
+    v.addEventListener("timeupdate", observe);
+    v.addEventListener("seeked", observe);
+  });
+  await expect.poll(() => video.evaluate(v => v.observedLoops), { timeout: 25000 }).toBeGreaterThanOrEqual(2);
+  await expect.poll(() => video.evaluate(v => v.currentTime > 1 && !v.paused && !v.ended)).toBe(true);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(video).not.toHaveAttribute("src");
   await expect(scene).not.toHaveClass(/has-motion-media/);
