@@ -1,10 +1,8 @@
 export const company = {
   name: "A&M Tech Solutions",
   shortName: "A&M",
-  positioning: "We build digital products that move businesses forward.",
-  description: "From your first website to the systems that run your business, we turn complex ideas into practical digital products.",
-  availability: "Project enquiries open",
-  contactEmail: ""
+  positioning: "Websites and useful software for small businesses and growing teams.",
+  description: "Websites, customer tools, and workflow automation for small businesses and growing teams. Clear scope, practical software, and a useful next step."
 };
 
 export const services = [

@@ -1,27 +1,45 @@
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
+import { pathToFileURL } from "node:url";
 
-const root = resolve(import.meta.dirname, "..");
-const port = Number(process.env.PORT || 4173);
-const host = process.env.HOST || "127.0.0.1";
-const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml", ".xml": "application/xml; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".json": "application/json; charset=utf-8" };
+const defaultRoot = resolve(import.meta.dirname, "..", "dist");
+const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png", ".xml": "application/xml; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".json": "application/json; charset=utf-8" };
 
-const server = createServer(async (request, response) => {
-  try {
-    const url = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
-    const requestPath = decodeURIComponent(url.pathname);
-    let file = resolve(root, `.${requestPath}`);
-    if (!file.startsWith(`${root}${sep}`) && file !== root) throw new Error("Invalid path");
-    try { if ((await stat(file)).isDirectory()) file = resolve(file, "index.html"); } catch { /* use SPA fallback */ }
-    let body;
-    try { body = await readFile(file); } catch { file = resolve(root, "index.html"); body = await readFile(file); }
-    response.writeHead(200, { "Content-Type": types[extname(file)] || "application/octet-stream", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "strict-origin-when-cross-origin" });
-    response.end(body);
-  } catch {
-    response.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
-    response.end("Bad request");
-  }
-});
+export async function createPreviewServer({ directory = defaultRoot, port = 4173, host = "127.0.0.1" } = {}) {
+  const root = resolve(directory);
+  const { basePath } = JSON.parse(await readFile(resolve(root, "build-info.json"), "utf8"));
+  const server = createServer(async (request, response) => {
+    const send = (status, body, type = "text/plain; charset=utf-8") => {
+      response.writeHead(status, { "Content-Type": type, "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "strict-origin-when-cross-origin" });
+      response.end(request.method === "HEAD" ? undefined : body);
+    };
+    try {
+      if (!["GET", "HEAD"].includes(request.method)) { send(405, "Method not allowed"); return; }
+      const url = new URL(request.url || "/", "http://localhost");
+      const path = decodeURIComponent(url.pathname);
+      if (basePath && path === basePath) { response.writeHead(308, { Location: `${basePath}/${url.search}` }); response.end(); return; }
+      if (basePath && !path.startsWith(`${basePath}/`)) { send(404, "Page not found"); return; }
+      const relativePath = path.slice(basePath.length);
+      let file = resolve(root, `.${relativePath}`);
+      if ((file !== root && !file.startsWith(`${root}${sep}`)) || relativePath.includes("\\") || relativePath.split("/").some(segment => segment.startsWith("."))) { send(400, "Bad request"); return; }
+      try {
+        if ((await stat(file)).isDirectory()) {
+          if (!path.endsWith("/")) { response.writeHead(308, { Location: `${url.pathname}/${url.search}` }); response.end(); return; }
+          file = resolve(file, "index.html");
+        }
+        send(200, await readFile(file), types[extname(file)] || "application/octet-stream");
+      } catch (error) {
+        if (!["ENOENT", "ENOTDIR"].includes(error.code)) throw error;
+        send(404, await readFile(resolve(root, "404.html")), "text/html; charset=utf-8");
+      }
+    } catch { send(400, "Bad request"); }
+  });
+  await new Promise((accept, reject) => { server.once("error", reject); server.listen(port, host, accept); });
+  return { server, url: `http://${host}:${server.address().port}${basePath}/` };
+}
 
-server.listen(port, host, () => console.log(`A&M Tech Solutions dev server: http://${host}:${port}`));
+if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
+  const { url } = await createPreviewServer({ port: Number(process.env.PORT || 4173), host: process.env.HOST || "127.0.0.1" });
+  console.log(`A&M Tech Solutions preview: ${url}`);
+}

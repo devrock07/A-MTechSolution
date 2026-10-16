@@ -15,7 +15,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  verify:
+    uses: ./.github/workflows/verify.yml
+
   build:
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -39,6 +43,8 @@ jobs:
           SITE_URL: ${{ steps.pages.outputs.base_url }}
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
           ASSET_VERSION: ${{ github.sha }}
+          CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
+          CONTACT_ENDPOINT: ${{ vars.CONTACT_ENDPOINT }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4

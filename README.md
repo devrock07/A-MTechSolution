@@ -1,66 +1,87 @@
-# A&M Tech Solutions website
+# A&M Tech Solutions
 
-A production-oriented, dependency-free website for A&M Tech Solutions. It uses semantic HTML, modular JavaScript, centralized content, responsive CSS, and a small Node build pipeline. No framework runtime or third-party component library is shipped to visitors.
+A static website for websites, customer tools, and workflow automation. All 23 pages are rendered to HTML during the build. Navigation and FAQs work without JavaScript; the small browser module enhances the mobile menu and project planner. No framework or third-party runtime is shipped to visitors.
 
-## Run locally
+## Local preview
 
-Requires Node.js 20 or later.
+Use Node.js **22 or later**.
 
-```powershell
+```sh
 npm run dev
 ```
 
-Open `http://127.0.0.1:4173`.
+Open `http://127.0.0.1:4173/`. This builds the site and serves `dist/`. After editing a source file, run `npm run build` in another terminal and refresh. `npm run preview` serves an existing build without rebuilding it.
 
-## Verify and build
+The preview server serves only generated files, uses correct content types, redirects directory URLs to their trailing-slash version, and returns HTTP 404 for missing pages and assets. It is a local preview server, not a form backend.
 
-```powershell
-npm run check
-npm run build
+## Tests
+
+```sh
+npm ci
+npx playwright install chromium firefox webkit
+npm run verify
 ```
 
-The deployable output is written to `dist/`. Local builds use the preview URL for canonical metadata. The GitHub Pages workflow supplies the real Pages URL and repository base path automatically.
+On Linux, install browser system dependencies with `npx playwright install --with-deps chromium firefox webkit`.
 
-## Deploy with GitHub Pages
+- `npm run check`: syntax checks every source, build, and test module.
+- `npm test`: verifies generated HTML, sitemap exclusions, metadata, all internal links/assets, root/subdirectory hosting, HTTP behavior, configuration validation, and delivery failures/timeouts.
+- `npm run qa:browser`: runs Chromium, Firefox, and WebKit tests. Every route is checked at 320, 390, 768, and 1440px. Tests also cover mobile navigation, keyboard focus, native FAQs, new tabs, back/refresh, disabled JavaScript, reduced motion, and configured/unconfigured contact flows. Chromium runs axe accessibility checks on every route at mobile and desktop widths.
 
-The included `.github/workflows/deploy-pages.yml` workflow verifies, builds, and deploys the site whenever `main` is pushed. It reads the Pages URL and repository base path from GitHub automatically, so both `username.github.io` repositories and ordinary project repositories are supported.
+The browser suite starts its own three local fixtures on ports 4300–4302. Form requests are intercepted in tests; no real inquiry is delivered. Fixtures use reserved `example.test` addresses and are never included in `dist/`. Reports and screenshots are saved under `playwright-report/`, `test-results/`, and `qa-artifacts/` (all ignored by Git). To run one browser: `npm run qa:browser -- --project=chromium`.
 
-1. Create or connect the GitHub repository and push this project to its `main` branch.
-2. In the repository, open **Settings → Pages**.
-3. Set **Source** to **GitHub Actions** if it is not selected automatically.
-4. Open the workflow run and wait for the `deploy` job to complete.
+## Content and configuration
 
-For a custom domain, configure the domain in GitHub Pages first, then set a repository variable or adjust the build environment so `SITE_URL` matches that verified domain. Do not add a `CNAME` file until the domain is confirmed.
+| File | Purpose |
+| --- | --- |
+| `site-config.js` | Verified business details, contact delivery, and publication flags |
+| `src/content.js` | Services, solutions, product concepts, and editable legal drafts |
+| `src/routes.js` | Shared route metadata and publication rules |
+| `src/pages.js` | HTML templates, layout, and project planner |
+| `src/app.js` | Progressive mobile menu behavior |
+| `src/contact.js` | Form validation, copying, and bounded delivery requests |
+| `src/styles.css` | Responsive presentation and accessible color tokens |
+| `scripts/build.mjs` | Static rendering, canonical metadata, asset versions, and sitemap |
+
+Business/contact placeholders are intentionally retained for completion later. The homepage emphasizes available service categories. Work, product, and legal drafts remain accessible at their original URLs for editing/review, but are marked `noindex, follow` and excluded from the public navigation and sitemap by default. `noindex` is not access control; preview content is still public.
+
+Complete and approve the relevant content before enabling `publishWork`, `publishProducts`, or `publishLegal`. The case-study template and unreleased product concept remain unindexed until their explicit draft status in `src/routes.js` is changed. Publishing legal pages also requires the entity, jurisdiction, effective date, and verified contact email. Replace the draft text with reviewed content first; the flag does not approve it.
 
 ## Contact delivery
 
-The contact interface validates inputs, includes a honeypot and minimum-completion-time check, handles loading and server failures, and never reports success without a successful server response.
+The project planner works before contact details are available. It clearly explains that online enquiries are unavailable, disables sending, and lets visitors copy a brief. When clipboard permission is denied, it provides selectable text for manual copying. Without JavaScript, users can read and edit the brief, but sending/copying controls remain disabled.
 
-Set `contactEndpoint` in `site-config.js` to a secure HTTPS endpoint that:
+Set `contactEmail` in `site-config.js` to display a real email link in the footer and contact page. Set `contactEndpoint` to a verified HTTPS JSON endpoint to enable sending. No sample address is substituted automatically.
 
-- accepts JSON `POST` requests;
-- validates and sanitizes all fields again on the server;
-- applies rate limiting and spam protection;
-- stores or delivers the enquiry before returning a 2xx response;
-- does not expose provider secrets to the browser;
-- returns a non-2xx status on delivery failure.
+The endpoint must:
 
-For a stricter production configuration, inject `site-config.js` during deployment rather than editing it manually. Content Security Policy and HSTS should be added by the production host after the verified form, font, and hosting origins are known.
+- accept JSON `POST` requests and allow the deployed origin through CORS;
+- validate all fields on the server and apply server-side spam protection/rate limiting;
+- accept `name`, `email`, `company`, `service`, `budget`, `contactMethod`, and `description`;
+- store or deliver the inquiry before returning a successful 2xx response;
+- return a non-2xx response on failure.
 
-## Content and routes
+Client honeypot/timing checks are only usability-level deterrents; they cannot protect an endpoint on their own. Delivery requests time out after 12 seconds, preserve the brief on failure, and prevent duplicate in-flight submissions. A timeout is reported as unconfirmed delivery because the server may have accepted the message before the connection stalled.
 
-- Company configuration: `src/content.js` and `site-config.js`
-- Presentation and routing: `src/app.js`
-- Design system: `src/styles.css`
-- Route-specific build metadata and sitemap: `scripts/build.mjs`
-- Visual assets: `public/`
+All browser configuration is public. **Never put provider secrets or API keys in this repository's client configuration.** Update the privacy content for the actual provider and data handling when delivery is enabled.
 
-Routes include the home page, services overview, eight service details, solutions, work directory and case-study template, products directory and product concept page, about, contact, and six legal documents.
+## GitHub Pages
 
-## Required before public launch
+In **Settings → Pages**, select **GitHub Actions** as the source. Pushes to `main` run the complete verification suite before building and deploying. Pull requests run the same checks without deployment. Browser reports are retained as workflow artifacts.
 
-1. If a custom production domain is connected, rebuild with its verified `SITE_URL`.
-2. Add verified contact details and a secure form endpoint.
-3. Have all legal drafts reviewed for the actual entity, jurisdiction, operations, providers, commercial terms, and contact details.
-4. Replace portfolio placeholders only with approved, verifiable project content.
-5. Re-audit privacy and cookies after hosting, analytics, forms, embeds, authentication, or billing tools are selected.
+The workflow reads the verified Pages URL and repository base path from GitHub. It supports both root sites and project sites such as `/A-MTechSolution/`; all rendered links, assets, canonical URLs, and sitemap entries use the same base path. A custom domain should be configured in Pages before deployment.
+
+Optional repository variables `CONTACT_EMAIL` and `CONTACT_ENDPOINT` can supply public contact configuration at build time. Empty variables fall back to `site-config.js`.
+
+To emulate project hosting locally in PowerShell:
+
+```powershell
+$env:BASE_PATH = '/A-MTechSolution'
+$env:SITE_URL = 'http://127.0.0.1:4173/A-MTechSolution'
+npm run build
+npm run preview
+```
+
+Open `http://127.0.0.1:4173/A-MTechSolution/`. Clear those environment variables or use a fresh terminal to return to root hosting.
+
+`public/brand-card.png` is the social preview image. Its editable source is `public/brand-card.svg`; regenerate the PNG with `npm run assets:social` after installing Chromium.
