@@ -37,7 +37,7 @@ jobs:
           path: |
             playwright-report/
             test-results/
-            qa-artifacts/*-home-*.png
-            qa-artifacts/*-contact-*.png
-            qa-artifacts/*-solutions-*.png
+            qa-artifacts/chromium-*.png
+            qa-artifacts/firefox-*.png
+            qa-artifacts/webkit-*.png
           retention-days: 7

@@ -27,6 +27,7 @@ export function setupMotion() {
   });
   window.addEventListener("pagehide", finishMotion);
   window.addEventListener("pageshow", event => { if (event.persisted) finishMotion(); });
+  reduced.addEventListener("change", () => { if (reduced.matches) finishMotion(); });
   document.addEventListener("focusin", event => {
     const element = event.target.closest(".reveal");
     active.get(element)?.cancel();
@@ -49,15 +50,21 @@ export function setupMotion() {
       });
     }, { threshold: 0.08, rootMargin: "0px 0px -24px" });
     document.querySelectorAll(".reveal").forEach(element => observer.observe(element));
-    reduced.addEventListener("change", () => { if (reduced.matches) finishMotion(); });
   }
 
+  // Only active surfaces participate in global resets, even on a long directory.
+  const tilting = new Set();
+  const resetTilts = () => tilting.forEach(reset => reset());
+  for (const event of ["pagehide", "resize", "scroll"]) window.addEventListener(event, resetTilts, { passive: true });
+  reduced.addEventListener("change", resetTilts);
+  finePointer.addEventListener("change", resetTilts);
   document.querySelectorAll("[data-tilt]").forEach(element => {
     let bounds;
     let frame = 0;
     let x = 0;
     let y = 0;
-    const max = Number(element.dataset.tilt) || 4;
+    const strength = Number(element.dataset.tilt);
+    const max = Number.isFinite(strength) ? Math.max(0, Math.min(10, strength)) : 4;
     const reset = () => {
       if (!bounds && !frame && !element.classList.contains("is-tilting")) return;
       cancelAnimationFrame(frame);
@@ -66,11 +73,12 @@ export function setupMotion() {
       element.style.removeProperty("--tilt-x");
       element.style.removeProperty("--tilt-y");
       element.classList.remove("is-tilting");
+      tilting.delete(reset);
     };
-    element.addEventListener("pointerenter", () => { bounds = element.getBoundingClientRect(); });
     element.addEventListener("pointermove", event => {
-      if (reduced.matches || !finePointer.matches || event.pointerType !== "mouse") return;
+      if (reduced.matches || !finePointer.matches || event.pointerType !== "mouse" || max === 0) return;
       bounds ||= element.getBoundingClientRect();
+      tilting.add(reset);
       x = Math.max(-1, Math.min(1, (event.clientX - bounds.left) / bounds.width * 2 - 1));
       y = Math.max(-1, Math.min(1, (event.clientY - bounds.top) / bounds.height * 2 - 1));
       if (frame) return;
@@ -82,8 +90,5 @@ export function setupMotion() {
       });
     }, { passive: true });
     for (const event of ["pointerleave", "pointercancel", "focusin"]) element.addEventListener(event, reset);
-    for (const event of ["pagehide", "resize", "scroll"]) window.addEventListener(event, reset, { passive: true });
-    reduced.addEventListener("change", reset);
-    finePointer.addEventListener("change", reset);
   });
 }

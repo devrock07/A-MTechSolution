@@ -1,8 +1,10 @@
 import { motionTime } from "./motion.js";
 
 export function setupWorkflowPreview() {
-  const preview = document.querySelector("[data-workflow-preview]");
-  if (!preview) return;
+  document.querySelectorAll("[data-workflow-preview]").forEach(setupPreview);
+}
+
+function setupPreview(preview) {
   const buttons = [...preview.querySelectorAll("[data-workflow-select]")];
   const panels = [...preview.querySelectorAll("[data-workflow-panel]")];
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
@@ -13,7 +15,7 @@ export function setupWorkflowPreview() {
     buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.workflowSelect === id)));
     panels.forEach(panel => { panel.hidden = panel.id !== id; });
     const current = panels.find(panel => !panel.hidden);
-    if (announce) status.textContent = `${current.querySelector("h2").textContent} workflow shown.`;
+    if (announce) status.textContent = `${current.querySelector("h2").textContent} Preview shown.`;
     if (announce && !reduced.matches && current.animate) {
       transition = current.querySelector(".workflow-steps").animate([
         { opacity: 0.2, transform: "translateY(10px)" },

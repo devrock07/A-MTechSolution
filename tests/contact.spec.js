@@ -75,6 +75,7 @@ test("configured delivery waits for acceptance and prevents duplicate submission
   complete();
   await expect(page.getByRole("status")).toContainText("Your inquiry was received");
   await expect(page.getByRole("textbox", { name: "Name", exact: true })).toHaveValue("");
+  await expect(page.locator("#brief-progress-meter")).toHaveAttribute("value", "0");
   await expect(page.getByRole("button", { name: "Send project inquiry" })).toBeEnabled();
   const elapsed = await page.locator('[name="formStartedAt"]').evaluate(field => Date.now() - Number(field.value));
   expect(elapsed).toBeLessThan(2500);

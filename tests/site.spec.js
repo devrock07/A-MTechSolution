@@ -148,7 +148,7 @@ test("root deployment uses root-relative links and email fallback", async ({ pag
 
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
-  for (const path of ["/", "/solutions/", "/services/crm-development/", "/contact/", "/legal/privacy-policy/"]) {
+  for (const path of ["/", "/solutions/", "/services/", "/services/crm-development/", "/contact/", "/legal/privacy-policy/"]) {
     test(`${path} still has visible content and usable navigation`, async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(`.${path}`);
@@ -156,11 +156,15 @@ test.describe("without JavaScript", () => {
       await expect(page.locator("#primary-navigation")).toBeVisible();
       await expect(page.locator(".menu-toggle")).toBeHidden();
       await expect(page.locator(".brand-entrance")).toBeHidden();
-      if (path === "/solutions/") {
+      if (path === "/solutions/" || path === "/") {
         await expect(page.locator("[data-workflow-panel]:visible")).toHaveCount(3);
         await expect(page.locator(".workflow-controls")).toBeHidden();
         await page.locator(".solution-approach summary").first().click();
         await expect(page.locator(".solution-service-link").first()).toBeVisible();
+      }
+      if (path === "/services/") {
+        await expect(page.locator(".service-item:visible")).toHaveCount(8);
+        await expect(page.locator(".service-filters")).toBeHidden();
       }
       if (path.includes("crm-development")) {
         const faq = page.locator(".faq-item").nth(1);
@@ -178,6 +182,7 @@ test.describe("without JavaScript", () => {
 });
 
 test("visual checkpoints", async ({ page }, testInfo) => {
+  test.setTimeout(90000);
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("./");
@@ -187,5 +192,9 @@ test("visual checkpoints", async ({ page }, testInfo) => {
     await page.screenshot({ path: `qa-artifacts/${testInfo.project.name}-contact-${width}.png` });
     await page.goto("./solutions/");
     await page.screenshot({ path: `qa-artifacts/${testInfo.project.name}-solutions-${width}.png`, animations: "disabled" });
+    for (const [label, path] of [["services", "services/"], ["service", "services/crm-development/"], ["about", "about/"], ["work", "work/"], ["work-template", "work/project-template/"], ["products", "products/"], ["product", "products/operations-hub/"], ["legal", "legal/privacy-policy/"], ["404", "missing/"]]) {
+      await page.goto(`./${path}`);
+      await page.screenshot({ path: `qa-artifacts/${testInfo.project.name}-${label}-${width}.png`, animations: "disabled" });
+    }
   }
 });

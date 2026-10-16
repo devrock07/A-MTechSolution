@@ -41,32 +41,46 @@ The browser suite starts its own three local fixtures on ports 4300–4302. Form
 | `src/app.js` | Progressive mobile menu behavior |
 | `src/contact.js` | Form validation, copying, and bounded delivery requests |
 | `src/motion.js` | Scroll reveals, entrance cleanup, and pointer-driven 3D tilt |
-| `src/solutions.js` | Accessible workflow selection and panel transitions |
-| `src/styles.css` | Responsive presentation and accessible color tokens |
+| `src/solutions.js` | Accessible homepage concept and Solutions workflow selection |
+| `src/experience.js` | Service filters and local brief completion progress |
+| `src/styles.css` | Base presentation, accessible color tokens, and motion timings |
+| `src/premium.css` | Shared premium surfaces, 3D illustrations, and responsive page layouts |
 | `scripts/build.mjs` | Static rendering, canonical metadata, asset versions, and sitemap |
 
 Business/contact placeholders are intentionally retained for completion later. The homepage emphasizes available service categories. Work, product, and legal drafts remain accessible at their original URLs for editing/review, but are marked `noindex, follow` and excluded from the public navigation and sitemap by default. `noindex` is not access control; preview content is still public.
 
 Complete and approve the relevant content before enabling `publishWork`, `publishProducts`, or `publishLegal`. The case-study template and unreleased product concept remain unindexed until their explicit draft status in `src/routes.js` is changed. Publishing legal pages also requires the entity, jurisdiction, effective date, and verified contact email. Replace the draft text with reviewed content first; the flag does not approve it.
 
-## Solutions design and motion
+## Site design and motion
 
-The Solutions page keeps the cream, charcoal, and lime brand palette with a layered 3D workflow illustration, three selectable journeys, six expandable solution cards, linked service suggestions, and a three-step starting guide. The illustration is editable HTML/CSS, with no downloaded 3D models, video assets, or canvas library. All workflow examples are clearly marked as illustrative.
+The cream, charcoal, and lime design extends across the homepage, services, service details, Solutions, About, project planner, work and product previews, policy drafts, and the 404 page. Illustrations use editable HTML/CSS; there are no downloaded 3D models, video assets, or canvas libraries. All concept examples are clearly labeled as illustrations.
 
-The A&M brand entrance plays once per tab session; subsequent pages have a short arrival curtain. Both are decorative, never lock scrolling or delay navigation, and are dismissed immediately by input. CSS completes the entrance even if the app script fails. Scroll reveals play once, with content visible by default when JavaScript or motion APIs are unavailable. Without JavaScript, all three workflow examples remain readable and the solution-card disclosures still work.
+- The homepage has three selectable concepts, a layered browser scene, floating workflow notes, expandable solution cards, and a six-step process grid.
+- Inner pages use dimensional introduction cards and consistent surface, type, spacing, and call-to-action styles. Selected service, capability, principle, product, and project-preview cards respond to pointer movement.
+- Services can be filtered by digital presence, connected operations, or product and support. Filters are native buttons with selected states and an announced result count.
+- The planner shows completion of its four required essentials. This is local feedback only: it does not save data, imply submission, or enable unconfigured delivery. The form itself remains stable while typing.
+- Policy contents are available on mobile as well as desktop, with numbered anchor links and a highlighted target section. Draft notices and publication restrictions remain intact.
+
+Solutions retains its three selectable journeys, six expandable cards, linked service suggestions, and three-step starting guide. Shared cards and motion use the same implementation throughout the site.
+
+The A&M brand entrance plays once per tab session; subsequent pages have a short arrival curtain. Both are decorative, never lock scrolling or delay navigation, and are dismissed immediately by input. CSS completes the entrance even if the app script fails. Scroll reveals play once, with content visible by default when JavaScript or motion APIs are unavailable. Without JavaScript, all homepage concepts and workflow examples remain readable, every service stays visible, and the solution-card disclosures and policy anchors still work.
 
 | Customize | Where |
 | --- | --- |
-| Main colors | `:root` tokens `--paper`, `--ink`, `--accent`, `--accent-dark` in `src/styles.css`; matching surface shades are in the Solutions CSS block |
+| Main colors | `:root` tokens `--paper`, `--ink`, `--accent`, `--accent-dark` in `src/styles.css`; `--surface`, `--surface-line`, and `--surface-shadow` in `src/premium.css` |
 | Reveal timing | `--reveal-duration` and `--reveal-stagger` (milliseconds or seconds) |
 | Entrance and page arrival | `--entrance-duration` and `--arrival-duration` |
 | Workflow switching and tilt return | `--workflow-switch-duration` and `--tilt-reset-duration` |
-| 3D depth | `--workflow-depth-step`; board perspective and resting angles in the Solutions CSS block |
-| Tilt strength | `data-tilt="5"` on workflow boards and `data-tilt="3"` on solution cards in `src/pages.js` (maximum degrees per axis) |
+| 3D depth | `--workflow-depth-step` in `src/styles.css`; `--scene-depth` in `src/premium.css`; perspective and resting angles in their scene rules |
+| Tilt strength | `data-tilt` in `src/pages.js`: degrees per axis, clamped to 0–10; 0 disables pointer tilt |
 | Workflow text and suggested services | `workflowPreviews` and `solutionServices` in `src/content.js` |
-| Layout, badges, and illustration layers | `solutionsPage()` in `src/pages.js` |
+| Homepage concept text and illustration layers | `interfaceVisual()` in `src/pages.js`; `.studio-*` in `src/premium.css` |
+| Shared hero graphic and cards | `depthMark()`, `pageHero()`, and `solutionCards()` in `src/pages.js` |
+| Service filter categories | `groups` in `servicesPage()` in `src/pages.js` |
 
-Motion targets smooth rendering through transform/opacity animation and event-driven `requestAnimationFrame` updates. Tilt has no idle render loop, reads bounds on entry rather than every pointer move, and runs only for a fine mouse pointer. Touch users get the same controls without pointer tilt. The operating system's reduced-motion preference disables entrances, reveals, tilt, and animated workflow switching, including when the preference changes while the page is open. Frame rate depends on the device and browser; 60fps is a design target, not a universal guarantee.
+Motion targets smooth rendering through transform/opacity animation and event-driven `requestAnimationFrame` updates. Tilt has no idle render loop, reads bounds at the start of a pointer interaction rather than every move, and runs only for a fine mouse pointer. A single set of scroll/resize handlers resets only active surfaces. Touch users get the same controls without pointer tilt. The operating system's reduced-motion preference disables entrances, reveals, tilt, and animated preview switching, including when the preference changes while the page is open. Frame rate depends on the device and browser; 60fps is a design target, not a universal guarantee.
+
+Browser tests cover all 23 routes at four widths, keyboard and touch controls, no-JavaScript and failed-script fallbacks, preference changes, tilt cleanup, filter results, brief validity/reset behavior, and configured delivery failures. Visual checkpoints include every page family on mobile and desktop in Chromium, Firefox, and WebKit; Chromium also runs axe on all routes.
 
 ## Contact delivery
 

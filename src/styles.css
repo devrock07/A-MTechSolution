@@ -465,7 +465,7 @@ html[data-entrance="arrival"] .entrance-wordmark { font-size: clamp(5rem, 13vw, 
 .directory-card.primary .status-chip { color: var(--accent); }
 
 .about-statement { display: grid; grid-template-columns: 0.35fr 0.65fr; gap: 4rem; }
-.about-statement p { margin: 0; font-size: clamp(2rem, 5vw, 4.9rem); line-height: 1.05; letter-spacing: -0.055em; }
+.about-statement > p { margin: 0; font-size: clamp(2rem, 5vw, 4.9rem); line-height: 1.05; letter-spacing: -0.055em; }
 .vision-line { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: end; }
 .vision-line blockquote { margin: 0; font-size: clamp(2.3rem, 5vw, 5rem); line-height: 1; letter-spacing: -0.06em; }
 
