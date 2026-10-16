@@ -12,7 +12,7 @@ export function renderPage(path, config) {
   const sitePath = path => joinSitePath(path, config.basePath);
 
   function faqList(items) {
-    return `<div class="faq-list">${items.map(([question, answer], index) => `<details class="faq-item" ${index === 0 ? "open" : ""}><summary class="faq-question">${question}</summary><div class="faq-answer"><p>${answer}</p></div></details>`).join("")}</div>`;
+    return `<div class="faq-list">${items.map(([question, answer], index) => `<details class="faq-item" ${index === 0 ? "open" : ""}><summary class="faq-question">${question}<span class="disclosure-icon" aria-hidden="true"></span></summary><div class="faq-answer"><p>${answer}</p></div></details>`).join("")}</div>`;
   }
 
 function link(href, label, className = "") {
@@ -28,7 +28,7 @@ function eyebrow(text) {
 }
 
 function breadcrumbs(items) {
-  return `<nav class="breadcrumbs" aria-label="Breadcrumb">${items.map((item, index) => item.href ? `${link(item.href, item.label)}${index < items.length - 1 ? " <span>/</span> " : ""}` : `<span aria-current="page">${item.label}</span>`).join("")}</nav>`;
+  return `<nav class="breadcrumbs" aria-label="Breadcrumb">${items.map((item, index) => item.href ? `${link(item.href, item.label)}${index < items.length - 1 ? ' <span aria-hidden="true">›</span> ' : ""}` : `<span aria-current="page">${item.label}</span>`).join("")}</nav>`;
 }
 
 function header(path) {
@@ -53,7 +53,7 @@ function footer() {
     <nav class="footer-nav" aria-label="Footer navigation"><div class="footer-col"><h2>What we do</h2>${link("/services/", "Services")}${link("/solutions/", "Solutions")}${config.publishWork ? link("/work/", "Work") : ""}${config.publishProducts ? link("/products/", "Products") : ""}</div>
     <div class="footer-col"><h2>Get to know us</h2>${link("/about/", "About")}${link("/contact/", contactReady ? "Contact" : "Project planner")}</div>
     ${config.publishLegal ? `<div class="footer-col"><h2>Policies</h2>${Object.entries(legalPages).map(([slug, page]) => link(`/legal/${slug}/`, page.title)).join("")}</div>` : ""}</nav>
-    </div><div class="footer-bottom"><span>© ${new Date().getFullYear()} ${escapeHtml(config.companyLegalName || company.name)}. All rights reserved.</span><span>Clear scope. Useful software. Shared progress.</span></div></div></footer>`;
+    </div><div class="footer-bottom"><span>© ${new Date().getFullYear()} ${escapeHtml(config.companyLegalName || company.name)}. All rights reserved.</span></div></div></footer>`;
 }
 
 function layout(content, path) {
@@ -70,11 +70,11 @@ function interfaceVisual() {
     <div class="preview-label"><span class="page-code">Inside the possibilities</span><span class="preview-badge">Illustrative concepts</span></div>
     <div class="studio-scene">
       <div class="studio-orbit" aria-hidden="true"></div>
-      ${previews.map(([id, label, title, caption, heading, flow, note, detail], index) => `<section class="studio-board" id="studio-${id}" data-workflow-panel data-tilt="5" aria-labelledby="studio-title-${id}">
-        <div class="studio-window"><span class="workflow-mark" aria-hidden="true">A&M</span><span class="page-code">Idea ${String(index + 1).padStart(2, "0")} / ${label}</span><span class="studio-dots" aria-hidden="true">•••</span></div>
+      ${previews.map(([id, label, title, caption, heading, flow, note, detail]) => `<section class="studio-board" id="studio-${id}" data-workflow-panel data-tilt="5" aria-labelledby="studio-title-${id}">
+        <div class="studio-window"><span class="workflow-mark" aria-hidden="true">A&M</span><span class="page-code">${label}</span></div>
         <div class="workflow-steps studio-content">
           <div class="studio-canvas"><span class="studio-kicker">Built around your business</span><p class="studio-display">${heading}</p><span class="studio-mini-link">${flow}<span aria-hidden="true"> ↗</span></span><div class="studio-sculpture" data-motion-accent><i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i><span aria-hidden="true">↗</span>${motionAccent()}</div></div>
-          <div class="studio-floating"><span class="studio-check" aria-hidden="true">↗</span><div><strong>${note}</strong><span>${detail}</span></div><span class="workflow-signal" aria-hidden="true"></span></div>
+          <div class="studio-floating"><span class="studio-check" aria-hidden="true">↗</span><div><strong>${note}</strong><span>${detail}</span></div></div>
           <div class="studio-caption"><h2 id="studio-title-${id}">${title}</h2><p>${caption}</p></div>
         </div>
       </section>`).join("")}
@@ -89,14 +89,14 @@ function depthMark() {
 }
 
 function motionAccent() {
-  return `<video class="motion-accent-video" data-motion-src="${sitePath("/media/studio-sculpture-v1.mp4")}" data-motion-rate="0.8" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><button class="motion-accent-control" type="button" aria-label="Pause illustration" title="Pause illustration" hidden><span aria-hidden="true">Ⅱ</span></button>`;
+  return `<video class="motion-accent-video" data-motion-src="${sitePath("/media/studio-sculpture-v1.mp4")}" data-motion-rate="0.8" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>`;
 }
 
 function solutionCards() {
   return `<div class="solution-card-grid">${solutions.map((item, index) => `<div class="reveal"><article class="solution-card" data-tilt="3">
-    <div class="solution-card-top"><span class="solution-card-icon" aria-hidden="true">${item.icon}</span><span class="page-code">0${index + 1} / Solution</span></div>
+    <div class="solution-card-top"><span class="solution-card-icon" aria-hidden="true">${item.icon}</span></div>
     <h3>${item.title}</h3><p>${item.problem}</p>
-    <details class="solution-approach"><summary>Explore approach <span aria-hidden="true">+</span></summary><div class="solution-approach-body"><p>${item.solution}</p><h4>A possible starting point</h4><div class="solution-service-links">${solutionServices[index].map(slug => link(`/services/${slug}/`, serviceBySlug[slug].title, "solution-service-link")).join("")}</div></div></details>
+    <details class="solution-approach"><summary>Explore approach <span class="disclosure-icon" aria-hidden="true"></span></summary><div class="solution-approach-body"><p>${item.solution}</p><h4>A possible starting point</h4><div class="solution-service-links">${solutionServices[index].map(slug => link(`/services/${slug}/`, serviceBySlug[slug].title, "solution-service-link")).join("")}</div></div></details>
   </article></div>`).join("")}</div>`;
 }
 
@@ -118,7 +118,7 @@ function homePage() {
           <h1>Software that works as hard as <em>your business.</em></h1>
           <p class="hero-copy">Explain your business clearly. Keep customer follow-ups in order. Give your team less repetitive work. We build the websites and software that make those next steps possible.</p>
           <div class="button-row">${button("/contact/", contactReady ? "Start a Project" : "Plan Your Project")}${button("/services/", "Explore Our Services", "button-ghost")}</div>
-          <p class="availability"><span class="availability-dot"></span>${contactReady ? "Project enquiries open" : "Websites / Customer tools / Automation"}</p>
+          <p class="availability">${contactReady ? "Project enquiries open" : "Websites, customer tools and automation"}</p>
         </div>
         <div class="reveal">${interfaceVisual()}</div>
       </div>
@@ -157,7 +157,7 @@ function homePage() {
     ${finalCta()}`;
 }
 
-function pageHero({ label, title, intro, code = `A&M / ${new Date().getFullYear()}`, crumbs = [] }) {
+function pageHero({ label, title, intro, code = "A&M Tech Solutions", crumbs = [] }) {
   return `<section class="page-hero"><div class="shell">${crumbs.length ? breadcrumbs(crumbs) : ""}<div class="page-hero-grid"><div class="reveal">${eyebrow(label)}<h1>${title}</h1></div><div class="hero-note-scene reveal"><div class="page-hero-side" data-tilt="3">${depthMark()}<p>${intro}</p><span class="page-code">${code}</span></div></div></div></div></section>`;
 }
 
@@ -166,25 +166,25 @@ function servicesPage() {
   return `${pageHero({ label: "Services", title: "Technology shaped around the work.", intro: "From a public-facing website to the systems behind daily operations, each engagement begins with the business problem—not a preselected stack." })}
     <section class="section"><div class="shell" data-service-directory><div class="service-directory-heading"><div>${eyebrow("Find your focus")}<h2 class="section-title small">What needs to work better?</h2></div><p class="section-lede">Start with a priority.<br />Explore the connected possibilities.</p></div>
     <div class="service-filters" role="group" aria-label="Filter services" hidden>${[["all", "All services"], ["presence", "Digital presence"], ["operations", "Connected operations"], ["product", "Product & support"]].map(([id, label], index) => `<button type="button" data-service-filter="${id}" aria-pressed="${index === 0}">${label}</button>`).join("")}</div><p class="sr-only" data-service-count role="status" aria-live="polite"></p>
-    <div class="service-list service-catalog">${services.map((service) => `<div class="service-item reveal" data-service-group="${groups[service.slug]}"><a class="service-row" data-tilt="3" href="${sitePath(`/services/${service.slug}/`)}"><span class="service-number">${service.number} / Expertise</span><h2>${service.title}</h2><p>${service.short}</p><span class="service-arrow" aria-hidden="true">↗</span></a></div>`).join("")}</div></div></section>
+    <div class="service-list service-catalog">${services.map((service) => `<div class="service-item reveal" data-service-group="${groups[service.slug]}"><a class="service-row" data-tilt="3" href="${sitePath(`/services/${service.slug}/`)}"><span class="service-number">${service.number}</span><h2>${service.title}</h2><p>${service.short}</p><span class="service-arrow" aria-hidden="true">↗</span></a></div>`).join("")}</div></div></section>
     <section class="section section-dark"><div class="shell two-col"><div>${eyebrow("Choosing the right path")}<h2 class="section-title small">Build, connect, or improve?</h2></div><div class="prose"><p>A custom build is not automatically the answer. Existing platforms may solve a standard need well. Integration may create more value than replacement. A focused redesign may be enough.</p><p>Discovery is how we establish the sensible path, surface constraints, and avoid paying for complexity the business does not need.</p>${button("/contact/", "Discuss the problem", "button-light")}</div></div></section>${finalCta()}`;
 }
 
 function serviceDetailPage(service) {
   const related = service.related.map((slug) => serviceBySlug[slug]).filter(Boolean);
-  return `${pageHero({ label: `Service ${service.number}`, title: service.title, intro: service.intro, code: "Service / Custom scope", crumbs: [{ label: "Services", href: "/services/" }, { label: service.title }] })}
+  return `${pageHero({ label: `Service ${service.number}`, title: service.title, intro: service.intro, code: "Custom project scope", crumbs: [{ label: "Services", href: "/services/" }, { label: service.title }] })}
     <section class="section"><div class="shell two-col"><div class="sticky-label">${eyebrow("The problems")}
       <h2 class="section-title small">When the current way of working gets in the way.</h2></div><div class="problem-list">${service.problems.map((problem) => `<div class="problem reveal"><p>${problem}</p></div>`).join("")}</div></div></section>
     <section class="section section-soft"><div class="shell"><div class="section-heading-row"><div>${eyebrow("Capabilities")}<h2 class="section-title small">What the engagement can cover.</h2></div><p class="section-lede">Final scope is defined after the requirements, constraints, and ownership model are understood.</p></div><div class="capability-grid">${service.capabilities.map((capability, index) => `<article class="capability reveal"><div class="capability-surface" data-tilt="3"><b>${String(index + 1).padStart(2, "0")}</b><span class="card-accent" aria-hidden="true">◇</span><h3>${capability}</h3></div></article>`).join("")}</div></div></section>
     <section class="section section-dark"><div class="shell"><div class="section-heading-row"><div>${eyebrow("Recommended use cases")}<h2 class="section-title small">A good fit when…</h2></div><p class="section-lede">The exact solution may be a build, an integration, or a staged improvement plan.</p></div><div class="use-case-grid">${service.useCases.map((item) => `<div class="use-case reveal">${item}</div>`).join("")}</div></div></section>
     <section class="section"><div class="shell two-col"><div>${eyebrow("Approach")}<h2 class="section-title small">Decisions before decoration.</h2></div><div class="prose"><p>${service.approach}</p><h3>Technology, where it matters</h3><p>${service.technology}</p></div></div></section>
     <section class="section section-soft"><div class="shell">${eyebrow("Frequently asked questions")}<h2 class="section-title small">Useful answers before we talk.</h2>${faqList(service.faqs)}</div></section>
-    <section class="section"><div class="shell">${eyebrow("Related services")}<h2 class="section-title small">The connected work.</h2><div class="related-links">${related.map((item) => `<a class="related-link reveal" href="${sitePath(`/services/${item.slug}/`)}"><span>${item.number} / Service</span><strong>${item.title} ↗</strong></a>`).join("")}</div></div></section>${finalCta()}`;
+    <section class="section"><div class="shell">${eyebrow("Related services")}<h2 class="section-title small">The connected work.</h2><div class="related-links">${related.map((item) => `<a class="related-link reveal" href="${sitePath(`/services/${item.slug}/`)}"><span>Service ${item.number}</span><strong>${item.title} ↗</strong></a>`).join("")}</div></div></section>${finalCta()}`;
 }
 
 function solutionsPage() {
   return `<section class="hero solutions-hero"><div class="shell solutions-hero-grid">
-    <div class="solutions-intro reveal">${eyebrow("Solutions / Built around you")}
+    <div class="solutions-intro reveal">${eyebrow("Solutions built around you")}
       <h1>Less friction.<br />More <em>flow.</em></h1>
       <p class="hero-copy">Bring your customers, team, and everyday work into a clearer rhythm. Useful software starts with understanding what gets in your way.</p>
       <div class="button-row">${link("#solution-types", "Find your starting point", "button")}${button("/contact/", "Plan a Project", "button-ghost")}</div>
@@ -195,10 +195,10 @@ function solutionsPage() {
       <div class="workflow-scene">
         <div class="workflow-halo" aria-hidden="true"></div>
         ${workflowPreviews.map((workflow, index) => `<section class="workflow-board" id="workflow-${workflow.id}" data-workflow-panel data-tilt="5" aria-labelledby="workflow-title-${workflow.id}">
-          <div class="workflow-board-top"><span class="workflow-mark" aria-hidden="true">A&M</span><span class="page-code">Workflow ${String(index + 1).padStart(2, "0")} / 03</span><span class="workflow-signal" aria-hidden="true"></span></div>
+          <div class="workflow-board-top"><span class="workflow-mark" aria-hidden="true">A&M</span><span class="page-code">Workflow ${index + 1} of ${workflowPreviews.length}</span></div>
           <h2 id="workflow-title-${workflow.id}">${workflow.title}</h2><p class="workflow-caption">${workflow.caption}</p>
           <ol class="workflow-steps">${workflow.steps.map(([title, detail, label], step) => `<li style="--step:${step}"><span class="workflow-step-number" aria-hidden="true">0${step + 1}</span><div><span class="workflow-step-label">${label}</span><h3>${title}</h3><p>${detail}</p></div><span class="workflow-step-arrow" aria-hidden="true">↗</span></li>`).join("")}</ol>
-          <div class="workflow-board-bottom"><span>One shared direction</span><span aria-hidden="true">◎</span></div>
+          <div class="workflow-board-bottom"><span>One shared direction</span></div>
         </section>`).join("")}
       </div>
       <div class="workflow-controls" role="group" aria-label="Explore a workflow">${workflowPreviews.map((workflow, index) => `<button type="button" data-workflow-select="workflow-${workflow.id}" aria-controls="workflow-${workflow.id}" aria-pressed="${index === 0}">${workflow.label}</button>`).join("")}</div>
@@ -222,7 +222,7 @@ function solutionsPage() {
 
 function workPage() {
   return `${pageHero({ label: "Work", title: "Evidence, not theatre.", intro: "This directory is intentionally honest. Verified project stories will be published when the client, screenshots, technologies, and outcomes are approved for public use." })}
-    <section class="section section-soft"><div class="shell"><div class="work-placeholder"><div class="work-visual"><div class="work-frame" data-tilt="5"><div class="work-frame-inner">REAL PROJECT MEDIA</div></div></div><div class="work-copy"><div><span class="status-chip">Template / not a client claim</span><h2>Case study structure</h2><p>Every project page supports a business category, problem statement, solution, verified technologies, screenshots, and additional project details.</p></div><div><p class="verified-note">Replace this record in the centralized content model only after project publication is approved.</p>${link("/work/project-template/", "Inspect the case study template", "text-link")}</div></div></div></div></section>${finalCta()}`;
+    <section class="section section-soft"><div class="shell"><div class="work-placeholder"><div class="work-visual"><div class="work-frame" data-tilt="5"><div class="work-frame-inner">REAL PROJECT MEDIA</div></div></div><div class="work-copy"><div><span class="status-chip">Project template</span><h2>Case study structure</h2><p>Every project page supports a business category, problem statement, solution, verified technologies, screenshots, and additional project details.</p></div><div><p class="verified-note">Replace this record in the centralized content model only after project publication is approved.</p>${link("/work/project-template/", "Inspect the case study template", "text-link")}</div></div></div></div></section>${finalCta()}`;
 }
 
 function workTemplatePage() {
@@ -239,7 +239,7 @@ function productsPage() {
 }
 
 function productDetailPage(product) {
-  return `${pageHero({ label: product.status, title: product.name, intro: product.description, code: "Product concept / No public release", crumbs: [{ label: "Products", href: "/products/" }, { label: product.name }] })}
+  return `${pageHero({ label: product.status, title: product.name, intro: product.description, code: "No public release yet", crumbs: [{ label: "Products", href: "/products/" }, { label: product.name }] })}
     <section class="section"><div class="shell two-col"><div>${eyebrow("Intended audience")}<h2 class="section-title small">Designed for a specific operational moment.</h2></div><div class="prose"><p>${product.audience}</p><p class="verified-note">This is a product direction, not an available or contracted feature set.</p></div></div></section>
     <section class="section section-dark"><div class="shell"><div class="section-heading-row"><div>${eyebrow("Concept capabilities")}<h2 class="section-title small">The working hypothesis.</h2></div><p class="section-lede">These areas indicate the problem space. Final capabilities depend on validation and release decisions.</p></div><div class="use-case-grid">${product.features.map((feature) => `<div class="use-case reveal">${feature}</div>`).join("")}</div></div></section>
     <section class="section"><div class="shell two-col"><div>${eyebrow("Availability")}<h2 class="section-title small">No public trial yet.</h2></div><div class="prose"><p>Pricing, plans, screenshots, account creation, email verification, trial duration, billing, and support details have not been finalized. The site does not collect payment information or create product accounts.</p>${button("/contact/", "Request an early conversation")}</div></div></section>
@@ -275,8 +275,8 @@ function contactPage() {
       ${formField("email", "Email", "email", true, "you@business.com")}
       ${formField("company", "Company name", "text", false, "Optional")}
       <div class="field"><label for="service">Service required <span aria-hidden="true">*</span></label><select id="service" name="service" required aria-describedby="service-error"><option value="">Select a service</option>${services.map(service => `<option value="${service.slug}">${service.title}</option>`).join("")}<option value="not-sure">Not sure yet</option></select><p class="field-error" id="service-error"></p></div>
-      <div class="field"><label for="budget">Project budget range</label><select id="budget" name="budget"><option value="">Prefer not to say</option><option>Exploring / not set</option><option>Under ₹1 lakh</option><option>₹1–3 lakh</option><option>₹3–8 lakh</option><option>₹8 lakh+</option></select></div>
-      <div class="field"><label for="contactMethod">Preferred contact method</label><select id="contactMethod" name="contactMethod"><option>Email</option><option>Phone / video call (arranged by email)</option></select></div>
+      <div class="field"><label for="budget">Project budget range</label><select id="budget" name="budget"><option value="">Prefer not to say</option><option>Not decided yet</option><option>Under ₹1 lakh</option><option>₹1–3 lakh</option><option>₹3–8 lakh</option><option>₹8 lakh+</option></select></div>
+      <div class="field"><label for="contactMethod">Preferred contact method</label><select id="contactMethod" name="contactMethod"><option>Email</option><option>Phone or video call (arranged by email)</option></select></div>
       <div class="field field-full"><label for="description">Project description <span aria-hidden="true">*</span></label><textarea id="description" name="description" required minlength="30" maxlength="4000" aria-describedby="description-help description-error" placeholder="What is happening now, who is affected, and what would a useful result look like?"></textarea><small id="description-help">30–4,000 characters. Please leave out passwords and sensitive personal information.</small><p class="field-error" id="description-error"></p></div>
       <div class="hp-field" aria-hidden="true"><label for="website">Leave this field empty</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off" /></div>
     </div>

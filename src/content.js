@@ -117,7 +117,7 @@ export const services = [
   {
     slug: "ui-ux-product-design",
     number: "07",
-    title: "UI/UX & Product Design",
+    title: "Interface & Product Design",
     short: "Clear interfaces and resilient design systems for products people need to use every day.",
     intro: "We turn dense requirements into understandable journeys, then build an interface language that stays consistent as the product grows.",
     problems: ["Users struggle to understand the next action", "A product has grown without a coherent interface system", "Mobile and desktop experiences feel disconnected", "Requirements have not been tested through realistic flows"],
@@ -144,7 +144,7 @@ export const services = [
     approach: "Support starts with a defined system boundary, response expectations, access model, and priority framework. Work is tracked transparently; emergency coverage is only included when explicitly agreed.",
     technology: "Effective support requires appropriate repository, hosting, monitoring, and provider access. We review the system before confirming service levels or responsibility.",
     faqs: [
-      ["Do you offer 24/7 support?", "Not by default. Coverage and response times must be agreed in writing for each support arrangement."],
+      ["Do you offer round-the-clock support?", "Not by default. Coverage and response times must be agreed in writing for each support arrangement."],
       ["Can you maintain software built by another team?", "Potentially. We first conduct a technical review to understand its condition, dependencies, deployment process, and risks."],
       ["Is maintenance included after launch?", "Only the support and warranty terms stated in the project agreement apply. Ongoing improvements are scoped separately or covered by an agreed plan."]
     ],
@@ -199,7 +199,7 @@ export const process = [
 ];
 
 export const productCategories = [
-  { slug: "operations-hub", status: "Concept / coming soon", name: "Operations Hub", category: "Business operations", description: "A configurable workspace concept for coordinating stock, work, approvals, and reporting. No public release or trial is currently available.", audience: "Growing operational teams exploring a more connected way to work.", features: ["Configurable workflows", "Role-aware workspaces", "Operational records", "Reporting views"], trial: false },
+  { slug: "operations-hub", status: "Coming soon", name: "Operations Hub", category: "Business operations", description: "A configurable workspace concept for coordinating stock, work, approvals, and reporting. No public release or trial is currently available.", audience: "Growing operational teams exploring a more connected way to work.", features: ["Configurable workflows", "Role-aware workspaces", "Operational records", "Reporting views"], trial: false },
   { status: "Future category", name: "CRM", category: "Customer management", description: "Lead, customer, pipeline, and follow-up tools may be introduced as verified products become available." },
   { status: "Future category", name: "Inventory", category: "Stock management", description: "Inventory and stock-control products will only be listed once a supported release exists." },
   { status: "Future category", name: "Workforce", category: "People operations", description: "Future workforce software may support practical scheduling and people workflows." },

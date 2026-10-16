@@ -237,7 +237,6 @@ html[data-entrance="arrival"] .entrance-wordmark { font-size: clamp(5rem, 13vw, 
 .hero h1 em { color: var(--accent-dark); font-style: normal; }
 .hero-copy { max-width: 39rem; margin: 2rem 0 0; color: var(--muted); font-size: clamp(1.05rem, 1.4vw, 1.25rem); }
 .availability { display: flex; align-items: center; gap: 0.65rem; margin-top: 2rem; color: var(--muted); font: 400 0.73rem/1 var(--mono); text-transform: uppercase; letter-spacing: 0.07em; }
-.availability-dot { width: 0.58rem; height: 0.58rem; border-radius: 50%; background: var(--accent-dark); box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 35%, transparent); }
 
 .interface-stage { position: relative; min-height: 36rem; }
 .stage-grid { position: absolute; inset: 0; opacity: 0.23; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 2.25rem 2.25rem; mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent); }
@@ -253,8 +252,6 @@ html[data-entrance="arrival"] .entrance-wordmark { font-size: clamp(5rem, 13vw, 
   transform: rotate(1.8deg);
 }
 .dash-top { height: 3.25rem; display: flex; align-items: center; justify-content: space-between; padding: 0 1.2rem; border-bottom: 1px solid var(--line); }
-.dash-dots { display: flex; gap: 0.35rem; }
-.dash-dots i { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--line); }
 .dash-status { font: 400 0.62rem/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; }
 .dash-body { display: grid; grid-template-columns: 4.2rem 1fr; min-height: calc(100% - 3.25rem); }
 .dash-rail { padding: 1rem; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 0.7rem; }
@@ -318,7 +315,6 @@ html[data-entrance="arrival"] .entrance-wordmark { font-size: clamp(5rem, 13vw, 
 .workflow-board-top { padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
 .workflow-board-top .page-code { font-size: .59rem; }
 .workflow-mark { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: .65rem; background: var(--ink); color: var(--accent); font: 600 .7rem/1 var(--mono); }
-.workflow-signal { width: .45rem; height: .45rem; border-radius: 50%; background: var(--accent-dark); box-shadow: 0 0 0 4px #e6edda; }
 .workflow-board h2 { margin: 1.5rem 0 .55rem; font-size: clamp(1.5rem, 2.5vw, 2.15rem); line-height: 1.07; letter-spacing: -.05em; }
 .workflow-caption { color: var(--muted); font-size: .81rem; margin: 0 0 1.6rem; max-width: 29rem; }
 .workflow-steps { list-style: none; padding: 0; margin: 0; display: grid; gap: .85rem; transform-style: preserve-3d; }
@@ -342,7 +338,6 @@ html[data-entrance="arrival"] .entrance-wordmark { font-size: clamp(5rem, 13vw, 
 .solution-card-grid > div { perspective: 1000px; }
 .solution-card { position: relative; min-height: 23rem; padding: 1.8rem; border: 1px solid #42493a; border-radius: 1.2rem; background: linear-gradient(145deg, #22271e, #191c17); box-shadow: 0 10px 25px #00000014; }
 .solution-card-top { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin-bottom: 2.6rem; }
-.solution-card-top .page-code { color: #bec6b3; font-size: .6rem; }
 .solution-card-icon { display: grid; place-items: center; width: 2.8rem; height: 2.8rem; color: var(--accent); background: #2d3720; border: 1px solid #4a5a32; border-radius: .85rem; font-size: 1.2rem; }
 .solution-card h3 { max-width: 15ch; margin: 0 0 1rem; font-size: clamp(1.5rem, 2.3vw, 2.1rem); line-height: 1.05; letter-spacing: -.045em; }
 .solution-card p { margin: 0 0 1.6rem; color: #c2c8b9; font-size: .9rem; }
@@ -350,8 +345,17 @@ html[data-entrance="arrival"] .entrance-wordmark { font-size: clamp(5rem, 13vw, 
 .solution-approach { border-top: 1px solid #42493a; }
 .solution-approach summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: 1rem .15rem; cursor: pointer; color: var(--accent); font-size: .82rem; list-style: none; }
 .solution-approach summary::-webkit-details-marker { display: none; }
-.solution-approach summary span { font-size: 1.15rem; transition: transform 180ms ease; }
-.solution-approach[open] summary span { transform: rotate(45deg); }
+.disclosure-icon { position: relative; display: block; flex: none; width: 2.75rem; height: 2.75rem; border: 1px solid var(--line); border-radius: .75rem; color: var(--ink); transition: background 180ms ease, border-color 180ms ease, color 180ms ease; }
+.disclosure-icon::before, .disclosure-icon::after { content: ""; position: absolute; inset: 0; margin: auto; width: 1.25rem; height: 2px; border-radius: 1px; background: currentColor; }
+.disclosure-icon::after { width: 2px; height: 1.25rem; transition: transform 180ms ease; }
+details[open] > summary .disclosure-icon::after { transform: scaleY(0); }
+summary:focus-visible .disclosure-icon { border-color: currentColor; background: var(--paper-2); }
+.solution-approach .disclosure-icon { border-color: #657151; color: var(--white); }
+.solution-approach summary:focus-visible .disclosure-icon { border-color: var(--accent); background: #303a25; color: var(--accent); }
+@media (hover: hover) {
+  summary:hover .disclosure-icon { border-color: currentColor; background: var(--paper-2); }
+  .solution-approach summary:hover .disclosure-icon { border-color: var(--accent); background: #303a25; color: var(--accent); }
+}
 .solution-approach-body { padding-top: 1.2rem; }
 .solution-approach-body p { margin-bottom: 1rem; }
 .solution-approach h4 { margin: 1.2rem 0 .7rem; color: var(--white); font: 500 .65rem/1.5 var(--mono); text-transform: uppercase; letter-spacing: .04em; }
@@ -443,8 +447,6 @@ html[data-entrance="arrival"] .entrance-wordmark { font-size: clamp(5rem, 13vw, 
 .faq-list { max-width: 60rem; margin: 4rem 0 0 auto; border-top: 1px solid var(--line); }
 .faq-item { border-bottom: 1px solid var(--line); }
 .faq-question { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center; padding: 1.6rem 0; border: 0; color: var(--ink); background: transparent; text-align: left; font-size: 1rem; font-weight: 700; cursor: pointer; }
-.faq-question::after { content: "+"; font: 400 1.2rem/1 var(--mono); transition: transform 180ms ease; }
-.faq-item[open] > .faq-question::after { transform: rotate(45deg); }
 .faq-question { list-style: none; }
 .faq-question::-webkit-details-marker { display: none; }
 .faq-item:not([open]) > .faq-answer { display: none; }
@@ -614,6 +616,6 @@ main:focus { outline: none; }
 .copy-fallback textarea { width: 100%; padding: 1rem; border: 1px solid var(--ink); border-radius: var(--radius-sm); color: var(--ink); background: var(--white); resize: vertical; }
 .form-note a { text-decoration: underline; }
 .availability { line-height: 1.6; }
-.availability-dot, .eyebrow::before { flex-shrink: 0; }
+.eyebrow::before { flex-shrink: 0; }
 .footer-brand .text-link { color: var(--white); overflow-wrap: anywhere; }
 .status-chip { max-width: 100%; width: fit-content; display: inline-block; line-height: 1.4; }

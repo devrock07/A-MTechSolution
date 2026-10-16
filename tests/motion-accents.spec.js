@@ -2,32 +2,24 @@ import { test, expect } from "@playwright/test";
 
 const asset = /\/media\/studio-sculpture-v1\.mp4/;
 
-test("desktop illustration plays, pauses by keyboard, ends and replays", async ({ page }) => {
+test("desktop illustration loops without controls and respects reduced motion", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("./about/");
   const scene = page.locator("[data-motion-accent]");
   const video = scene.locator("video");
-  const control = scene.locator("button");
   await scene.scrollIntoViewIfNeeded();
   await expect(scene).toHaveClass(/has-motion-media/);
   await expect.poll(() => video.evaluate(v => v.currentTime > 0), { timeout: 10000 }).toBe(true);
-  // Start keyboard checks from a completed clip, avoiding an end/pause race.
-  await expect(control).toHaveAccessibleName("Replay illustration", { timeout: 12000 });
-  await control.focus();
-  await page.keyboard.press("Enter");
-  await expect(control).toHaveAccessibleName("Pause illustration");
-  await page.keyboard.press("Enter");
-  await expect(control).toHaveAccessibleName("Play illustration");
-  expect(await video.evaluate(v => v.paused)).toBe(true);
-  await page.keyboard.press("Enter");
-  await expect(control).toHaveAccessibleName("Pause illustration");
-  await expect(control).toHaveAccessibleName("Replay illustration", { timeout: 12000 });
-  await page.keyboard.press("Enter");
-  await expect(control).toHaveAccessibleName("Pause illustration");
-  expect(await video.evaluate(v => v.currentTime < 2)).toBe(true);
+  await expect(scene.locator("button")).toHaveCount(0);
+  expect(await video.evaluate(v => v.controls)).toBe(false);
+  // Cross the real media boundary twice: a loop must restart without a click.
+  for (let cycle = 0; cycle < 2; cycle++) {
+    await video.evaluate(v => { v.currentTime = v.duration - 0.3; });
+    await expect.poll(() => video.evaluate(v => v.currentTime < 1 && !v.paused && !v.ended)).toBe(true);
+    await expect.poll(() => video.evaluate(v => v.currentTime > 1)).toBe(true);
+  }
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(video).not.toHaveAttribute("src");
-  await expect(control).toBeHidden();
   await expect(scene).not.toHaveClass(/has-motion-media/);
   await expect(scene.locator("i").last()).toHaveCSS("opacity", "1");
 });
@@ -46,7 +38,7 @@ test("phones and wide touch devices never request the desktop asset", async ({ b
         await Promise.allSettled(document.getAnimations().map(animation => animation.finished));
       });
       expect(await page.locator("[data-motion-accent] video[src]").count()).toBe(0);
-      expect(await page.locator(".motion-accent-control:visible").count()).toBe(0);
+      expect(await page.locator("[data-motion-accent] button, [data-motion-accent] video[controls]").count()).toBe(0);
     }
     expect(requests).toEqual([]);
     await context.close();
@@ -62,7 +54,7 @@ test("desktop reduced motion, data saving and no-JS keep the static fallback", a
     page.on("request", request => { if (asset.test(request.url())) requests.push(request.url()); });
     await page.goto("./about/");
     await expect(page.locator(".depth-mark i").last()).toBeVisible();
-    await expect(page.locator(".motion-accent-control")).toBeHidden();
+    await expect(page.locator("[data-motion-accent] button")).toHaveCount(0);
     await page.waitForLoadState("networkidle");
     expect(requests).toEqual([]);
     await context.close();
@@ -86,7 +78,7 @@ test("a failed video preserves the existing artwork and navigation", async ({ pa
   await expect.poll(() => page.evaluate(() => window.failedIllustrations)).toBeGreaterThan(0);
   await expect(page.locator(".depth-mark")).not.toHaveClass(/has-motion-media/);
   await expect(page.locator(".depth-mark i").last()).toHaveCSS("opacity", "1");
-  await expect(page.locator(".motion-accent-control")).toBeHidden();
+  await expect(page.locator("[data-motion-accent] button")).toHaveCount(0);
   await page.locator("#primary-navigation").getByRole("link", { name: "Services", exact: true }).click();
   await expect(page).toHaveURL(/\/services\/$/);
 });
@@ -105,7 +97,25 @@ test("hidden concepts pause and narrowing the window releases desktop media", as
   await expect.poll(() => next.evaluate(v => v.currentTime > 0), { timeout: 10000 }).toBe(true);
   await page.locator("footer").scrollIntoViewIfNeeded();
   await expect.poll(() => next.evaluate(v => v.paused)).toBe(true);
+  const pausedAt = await next.evaluate(v => v.currentTime);
+  await page.locator("#studio-customers [data-motion-accent]").scrollIntoViewIfNeeded();
+  await expect.poll(() => next.evaluate((v, time) => !v.paused && v.currentTime !== time, pausedAt)).toBe(true);
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator("[data-motion-accent] video[src]")).toHaveCount(0);
-  await expect(page.locator(".motion-accent-control:visible")).toHaveCount(0);
+  await expect(page.locator("[data-motion-accent] button")).toHaveCount(0);
+});
+
+test("blocked autoplay retains the static artwork without playback controls", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.addInitScript(() => {
+    HTMLMediaElement.prototype.play = () => Promise.reject(new DOMException("Autoplay blocked", "NotAllowedError"));
+  });
+  await page.goto("./about/");
+  const scene = page.locator("[data-motion-accent]");
+  await scene.scrollIntoViewIfNeeded();
+  await page.waitForLoadState("networkidle");
+  await expect(scene).not.toHaveClass(/has-motion-media/);
+  await expect(scene.locator("i").last()).toHaveCSS("opacity", "1");
+  await expect(scene.locator("video")).not.toHaveAttribute("src");
+  await expect(scene.locator("button")).toHaveCount(0);
 });
