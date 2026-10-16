@@ -8,6 +8,7 @@ export const company = {
 export const services = [
   {
     slug: "website-development",
+    number: "01",
     title: "Website Development",
     short: "Fast, distinctive websites that make the business clear and the next step obvious.",
     intro: "We design and build digital storefronts that earn attention, explain your value, and give visitors a confident path to action.",
@@ -25,6 +26,7 @@ export const services = [
   },
   {
     slug: "web-application-development",
+    number: "02",
     title: "Web Application Development",
     short: "Purpose-built portals, internal tools, and workflow applications for real operational needs.",
     intro: "When spreadsheets, inboxes, and disconnected tools start slowing the business down, a focused web application can turn the workflow into one dependable system.",
@@ -42,6 +44,7 @@ export const services = [
   },
   {
     slug: "crm-development",
+    number: "03",
     title: "CRM Development",
     short: "Customer and sales systems shaped around the way your team actually follows up.",
     intro: "A useful CRM should help the team act, not create more administration. We design the pipeline, customer history, and follow-up workflow around your sales process.",
@@ -59,6 +62,7 @@ export const services = [
   },
   {
     slug: "erp-business-systems",
+    number: "04",
     title: "ERP & Business Systems",
     short: "Connected inventory, procurement, operations, and reporting without forcing the wrong workflow.",
     intro: "We help growing businesses replace fragmented operational records with a system that reflects how stock, work, and decisions move through the company.",
@@ -76,6 +80,7 @@ export const services = [
   },
   {
     slug: "saas-product-development",
+    number: "05",
     title: "SaaS Product Development",
     short: "A structured path from product idea to a secure, usable subscription software foundation.",
     intro: "We help shape and build software products with a clear audience, focused first release, and architecture that can grow without pretending every feature belongs in version one.",
@@ -93,6 +98,7 @@ export const services = [
   },
   {
     slug: "custom-software-automation",
+    number: "06",
     title: "Custom Software & Automation",
     short: "Practical systems and integrations that remove repetitive work and connect the tools you keep.",
     intro: "Not every problem needs a giant platform. Sometimes the highest-value move is one reliable tool, integration, or automation that gives the team time and visibility back.",
@@ -110,6 +116,7 @@ export const services = [
   },
   {
     slug: "ui-ux-product-design",
+    number: "07",
     title: "Interface & Product Design",
     short: "Clear interfaces and resilient design systems for products people need to use every day.",
     intro: "We turn dense requirements into understandable journeys, then build an interface language that stays consistent as the product grows.",
@@ -127,6 +134,7 @@ export const services = [
   },
   {
     slug: "maintenance-support",
+    number: "08",
     title: "Maintenance & Technical Support",
     short: "Agreed support for the fixes, improvements, and operational care a live product needs.",
     intro: "Launch is the start of real usage. We offer clearly scoped support arrangements that keep software dependable and create a practical path for improvement.",
@@ -182,12 +190,12 @@ export const solutionServices = [
 ];
 
 export const process = [
-  ["Discover", "Understand the business, the people involved, and the problem worth solving."],
-  ["Plan", "Define scope, workflows, priorities, constraints, and a delivery roadmap."],
-  ["Design", "Make the experience tangible before committing to implementation detail."],
-  ["Build", "Develop, integrate, and test the agreed product in useful increments."],
-  ["Launch", "Deploy carefully and verify the production experience and critical paths."],
-  ["Improve", "Support agreed fixes, learning, and the next high-value improvements."]
+  ["01", "Discover", "Understand the business, the people involved, and the problem worth solving."],
+  ["02", "Plan", "Define scope, workflows, priorities, constraints, and a delivery roadmap."],
+  ["03", "Design", "Make the experience tangible before committing to implementation detail."],
+  ["04", "Build", "Develop, integrate, and test the agreed product in useful increments."],
+  ["05", "Launch", "Deploy carefully and verify the production experience and critical paths."],
+  ["06", "Improve", "Support agreed fixes, learning, and the next high-value improvements."]
 ];
 
 export const productCategories = [

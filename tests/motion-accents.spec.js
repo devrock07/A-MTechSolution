@@ -95,7 +95,6 @@ test("hidden concepts pause and narrowing the window releases desktop media", as
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("./");
   const first = page.locator("#studio-presence video");
-  await page.locator("#studio-presence [data-motion-accent]").scrollIntoViewIfNeeded();
   await expect.poll(() => first.evaluate(v => v.currentTime > 0), { timeout: 10000 }).toBe(true);
   expect(await page.locator("[data-workflow-panel][hidden] video[src]").count()).toBe(0);
   await page.getByRole("button", { name: "Customer tools", exact: true }).click();

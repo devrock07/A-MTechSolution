@@ -7,5 +7,5 @@ Thumbs.db
 .env
 *.log
 qa-artifacts/
-.taste-skill/
 *-home.png
+.taste-skill/

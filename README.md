@@ -45,7 +45,7 @@ The browser suite starts its own three local fixtures on ports 4300–4302. Form
 | `src/solutions.js` | Accessible homepage concept and Solutions workflow selection |
 | `src/experience.js` | Service filters and local brief completion progress |
 | `src/styles.css` | Base presentation, accessible color tokens, and motion timings |
-| `src/premium.css` | Open compositions, larger desktop illustrations, and responsive page layouts |
+| `src/premium.css` | Shared premium surfaces, 3D illustrations, and responsive page layouts |
 | `scripts/build.mjs` | Static rendering, canonical metadata, asset versions, and sitemap |
 
 Business/contact placeholders are intentionally retained for completion later. The homepage emphasizes available service categories. Work, product, and legal drafts remain accessible at their original URLs for editing/review, but are marked `noindex, follow` and excluded from the public navigation and sitemap by default. `noindex` is not access control; preview content is still public.
@@ -54,11 +54,7 @@ Complete and approve the relevant content before enabling `publishWork`, `publis
 
 ## Site design and motion
 
-The current design uses the Type and nothing else direction from [Taste Skill](https://github.com/Leonxlnx/taste-skill), adapted for the existing business content. Bodoni Moda headings and Jost body text are self-hosted under `public/fonts/`, with their OFL licenses; the three WOFF2 files total about 57 KiB. The typography-led homepage leads into an open concept explorer. Service and solution lists use spacing and alignment instead of repeated boxed cards. Orbital rings, mockup frames, ornamental metadata, badges, glows, and page-transition rails have been removed.
-
-The existing 960px sculpture is displayed in a 416px desktop canvas on the homepage and a 352px canvas in inner-page introductions. Its visible object is roughly twice its previous homepage size. Flat scene backgrounds let the source matte blend into the page without a pale halo. Mobile keeps the small CSS illustration and does not fetch the video. No additional image or animation dependencies were added.
-
-Taste review exceptions are intentional: the real controls and native disclosure links remain, even when a heuristic mistakes them for eyebrows; the anti-spam field stays visually hidden; the media mask composites the existing video. Four decorative stock photos and extra constant motion would conflict with the requested lightweight mobile experience and preservation of existing content, so they were not added. Existing Web Animations API scroll reveals are verified by browser tests even though the Taste inspector does not count them reliably.
+The previous visual design is retained. The homepage concept illustration has no outer mockup frame, window header, orbital rings, or "Illustrative concepts" badge; its inner preview, floating note, captions, controls, and existing motion remain.
 
 The cream, charcoal, and lime design extends across the homepage, services, service details, Solutions, About, project planner, work and product previews, policy drafts, and the 404 page. Illustrations use editable HTML/CSS, enhanced on desktop by a small Higgsfield-generated 3D video accent. No 3D model or canvas library is shipped. All concept examples are clearly labeled as illustrations.
 
@@ -74,16 +70,16 @@ The A&M brand entrance plays once per tab session (720ms); subsequent pages have
 
 The existing homepage sculpture and inner-page hero graphic use `public/media/studio-sculpture-v1.mp4`, created with Higgsfield Seedance 2.5 (job `7796e97a-2f6d-4045-8a19-ec124052da27`). It is a silent, five-second, 960 × 960 3D-rendered stack in the site's palette, approximately 414 KiB. The MP4 is repackaged without re-encoding, with playback metadata first; the preview server supports byte-range requests. It loops at 0.8× speed without playback buttons. Video dimensions are set directly instead of enlarging a rasterized layer with CSS scale. Only an onscreen desktop illustration (at least 961px, fine pointer, hover, no reduced motion or data-saving preference) receives a video source. Hidden previews and background tabs pause playback automatically. Phones and touch devices receive no video request or 3D model; the original CSS artwork has a one-second 2D fade-and-rise. Failed media, blocked autoplay, and disabled JavaScript retain the original illustration.
 
-Shared labels use plain wording without decorative slash separators or status dots. Solution cards and FAQs use 44px filled expand controls with a 20px plus that becomes a minus when open. The native details elements work with keyboard, touch, and JavaScript disabled; their styles live under `.disclosure-icon` in `src/styles.css`.
+Shared labels use plain wording without decorative slash separators or status dots. Solution cards and FAQs use 44px outlined expand controls with a 20px plus that becomes a minus when open. The native details elements work with keyboard, touch, and JavaScript disabled; their styles live under `.disclosure-icon` in `src/styles.css`.
 
 | Customize | Where |
 | --- | --- |
-| Main colors | `:root` tokens `--paper`, `--ink`, `--accent`, `--accent-dark` in `src/styles.css` |
+| Main colors | `:root` tokens `--paper`, `--ink`, `--accent`, `--accent-dark` in `src/styles.css`; `--surface`, `--surface-line`, and `--surface-shadow` in `src/premium.css` |
 | Reveal timing | `--reveal-duration` and `--reveal-stagger` (milliseconds or seconds) |
 | Entrance and page arrival | `--entrance-duration` and `--arrival-duration` |
-| Generated desktop accent | `motionAccent()` in `src/pages.js`: replace the versioned MP4 path and adjust `data-motion-rate` (0.8 by default); layout and blending are under the desktop media query in `src/premium.css` |
+| Generated desktop accent | `motionAccent()` in `src/pages.js`: replace the versioned MP4 path and adjust `data-motion-rate` (0.8 by default); layout, blending, and scale are at the end of `src/premium.css` |
 | Workflow switching and tilt return | `--workflow-switch-duration` and `--tilt-reset-duration` |
-| 3D depth | `--workflow-depth-step` in `src/styles.css`; perspective in `src/premium.css` |
+| 3D depth | `--workflow-depth-step` in `src/styles.css`; `--scene-depth` in `src/premium.css`; perspective and resting angles in their scene rules |
 | Tilt strength | `data-tilt` in `src/pages.js`: degrees per axis, clamped to 0–10; 0 disables pointer tilt |
 | Workflow text and suggested services | `workflowPreviews` and `solutionServices` in `src/content.js` |
 | Homepage concept text and illustration layers | `interfaceVisual()` in `src/pages.js`; `.studio-*` in `src/premium.css` |
