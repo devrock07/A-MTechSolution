@@ -40,7 +40,7 @@ The browser suite starts its own three local fixtures on ports 4300–4302. Form
 | `src/pages.js` | HTML templates, layout, and project planner |
 | `src/app.js` | Progressive mobile menu behavior |
 | `src/contact.js` | Form validation, copying, and bounded delivery requests |
-| `src/motion.js` | Scroll reveals, ambient motion lifecycle, pause preference, and pointer-driven 3D tilt |
+| `src/motion.js` | Scroll reveals, entrance cleanup, and pointer-driven 3D tilt |
 | `src/solutions.js` | Accessible homepage concept and Solutions workflow selection |
 | `src/experience.js` | Service filters and local brief completion progress |
 | `src/styles.css` | Base presentation, accessible color tokens, and motion timings |
@@ -63,9 +63,7 @@ The cream, charcoal, and lime design extends across the homepage, services, serv
 
 Solutions retains its three selectable journeys, six expandable cards, linked service suggestions, and three-step starting guide. Shared cards and motion use the same implementation throughout the site.
 
-Page arrival uses a two-pixel accent sweep, with no full-screen curtain. Content in the initial viewport stays visible instead of fading out after the app loads; below-the-fold scroll reveals play once. Without JavaScript, all homepage concepts and workflow examples remain readable, every service stays visible, and the solution-card disclosures and policy anchors still work.
-
-The homepage and Solutions scenes, inner-page A&M sculptures, and work-preview illustration drift automatically on desktop and touch screens. Layered notes move at a different pace to add depth. Loops take 10–14 seconds and travel only a few pixels. The header's pause button freezes the current pose, remembers the choice for this tab session across pages, and lets visitors resume smoothly. Animations pause offscreen and in hidden tabs; forms, navigation, and preview controls remain stationary.
+The A&M brand entrance plays once per tab session; subsequent pages have a short arrival curtain. Both are decorative, never lock scrolling or delay navigation, and are dismissed immediately by input. CSS completes the entrance even if the app script fails. Scroll reveals play once, with content visible by default when JavaScript or motion APIs are unavailable. Without JavaScript, all homepage concepts and workflow examples remain readable, every service stays visible, and the solution-card disclosures and policy anchors still work.
 
 | Customize | Where |
 | --- | --- |
@@ -73,8 +71,6 @@ The homepage and Solutions scenes, inner-page A&M sculptures, and work-preview i
 | Reveal timing | `--reveal-duration` and `--reveal-stagger` (milliseconds or seconds) |
 | Entrance and page arrival | `--entrance-duration` and `--arrival-duration` |
 | Workflow switching and tilt return | `--workflow-switch-duration` and `--tilt-reset-duration` |
-| Automatic motion speed and range | `--ambient-duration` (default `12000ms`), `--ambient-distance` (`6px`), and `--ambient-angle` (`1.5deg`) in `src/styles.css`; object/layer duration multipliers in the adjacent rules |
-| Which illustrations move | Scene/object/layer selector lists in `setupMotion()`; `ambient-scene`, `ambient-object`, and `ambient-layer` keyframes in `src/styles.css` |
 | 3D depth | `--workflow-depth-step` in `src/styles.css`; `--scene-depth` in `src/premium.css`; perspective and resting angles in their scene rules |
 | Tilt strength | `data-tilt` in `src/pages.js`: degrees per axis, clamped to 0–10; 0 disables pointer tilt |
 | Workflow text and suggested services | `workflowPreviews` and `solutionServices` in `src/content.js` |
@@ -82,9 +78,9 @@ The homepage and Solutions scenes, inner-page A&M sculptures, and work-preview i
 | Shared hero graphic and cards | `depthMark()`, `pageHero()`, and `solutionCards()` in `src/pages.js` |
 | Service filter categories | `groups` in `servicesPage()` in `src/pages.js` |
 
-Motion targets smooth rendering through transform/opacity animation. Ambient loops use compositor-friendly `translate`/`rotate` properties; mouse tilt uses a separate `transform` so the effects do not overwrite each other. There is no idle JavaScript render loop. Tilt reads the stable parent scene at the start of a pointer interaction, updates on animation frames, and runs only for a fine mouse pointer. A single set of scroll/resize handlers resets only active surfaces. The operating system's reduced-motion preference disables ambient loops, entrances, reveals, tilt, and animated preview switching, including live preference changes. Frame rate depends on the device and browser; 60fps is a design target, not a universal guarantee.
+Motion targets smooth rendering through transform/opacity animation and event-driven `requestAnimationFrame` updates. Tilt has no idle render loop, reads bounds at the start of a pointer interaction rather than every move, and runs only for a fine mouse pointer. A single set of scroll/resize handlers resets only active surfaces. Touch users get the same controls without pointer tilt. The operating system's reduced-motion preference disables entrances, reveals, tilt, and animated preview switching, including when the preference changes while the page is open. Frame rate depends on the device and browser; 60fps is a design target, not a universal guarantee.
 
-Browser tests cover all 23 routes at four widths, keyboard and touch controls, no-JavaScript and failed-script fallbacks, delayed-script entrance behavior, autonomous mobile motion, loop continuity, offscreen/visibility pausing, pause persistence, preference changes, tilt cleanup, filter results, brief validity/reset behavior, and configured delivery failures. Visual checkpoints include every page family on mobile and desktop in Chromium, Firefox, and WebKit; Chromium also runs axe on all routes.
+Browser tests cover all 23 routes at four widths, keyboard and touch controls, no-JavaScript and failed-script fallbacks, preference changes, tilt cleanup, filter results, brief validity/reset behavior, and configured delivery failures. Visual checkpoints include every page family on mobile and desktop in Chromium, Firefox, and WebKit; Chromium also runs axe on all routes.
 
 ## Contact delivery
 

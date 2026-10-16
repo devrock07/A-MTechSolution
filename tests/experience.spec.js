@@ -1,13 +1,12 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { pointInScene } from "./motion-helpers.js";
 
 async function settleMotion(page, target) {
   await target.scrollIntoViewIfNeeded();
   await page.evaluate(async () => {
     // IntersectionObserver can start a reveal on the frame after scrolling.
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    await Promise.allSettled(document.getAnimations().filter(animation => animation.effect.getTiming().iterations !== Infinity).map(animation => animation.finished));
+    await Promise.allSettled(document.getAnimations().map(animation => animation.finished));
     await new Promise(resolve => requestAnimationFrame(resolve));
   });
 }
@@ -116,8 +115,7 @@ test.describe("touch and no-script fallbacks", () => {
     await page.goto("./");
     await page.getByRole("button", { name: "Automation", exact: true }).tap();
     await expect(page.locator("#studio-automation")).toBeVisible();
-    const point = await pointInScene(page.locator("#studio-automation"));
-    await page.touchscreen.tap(point.x, point.y);
+    await page.locator("#studio-automation h2").tap();
     await expect(page.locator(".is-tilting")).toHaveCount(0);
     await page.goto("./services/");
     await page.getByRole("button", { name: "Connected operations", exact: true }).tap();

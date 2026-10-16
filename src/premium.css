@@ -171,7 +171,7 @@
 
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .service-row[data-tilt] { transition: transform var(--tilt-reset-duration) ease, border-color 180ms ease, background 180ms ease; }
-  .service-row[data-tilt].is-tilting { transition-duration: 180ms; }
+  .service-row[data-tilt].is-tilting { transition-duration: 100ms; }
   .studio-board[data-tilt] { transform: rotateX(calc(4deg + var(--tilt-x, 0deg))) rotateY(calc(-5deg + var(--tilt-y, 0deg))); }
   .page-hero-side[data-tilt] { transform: rotateX(var(--tilt-x, 0deg)) rotateY(calc(-3deg + var(--tilt-y, 0deg))); }
   .work-frame[data-tilt] { transform: rotateX(calc(5deg + var(--tilt-x, 0deg))) rotateY(calc(-5deg + var(--tilt-y, 0deg))); }
