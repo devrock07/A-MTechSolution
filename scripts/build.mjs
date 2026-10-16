@@ -21,7 +21,7 @@ export async function buildSite({ output = resolve(root, "dist"), config: overri
   if (canonical.pathname.replace(/\/$/, "") !== config.basePath) throw new Error("SITE_URL pathname must match BASE_PATH.");
   const canonicalSite = canonical.href.replace(/\/$/, "");
   const template = await readFile(resolve(root, "index.html"), "utf8");
-  const assets = ["src/app.js", "src/contact.js", "src/motion.js", "src/solutions.js", "src/experience.js", "src/styles.css", "src/premium.css"];
+  const assets = ["src/app.js", "src/contact.js", "src/motion.js", "src/motion-accents.js", "src/solutions.js", "src/experience.js", "src/styles.css", "src/premium.css"];
   const sources = await Promise.all(assets.map(file => readFile(resolve(root, file), "utf8")));
   const version = assetVersion || createHash("sha256").update(sources.join("\n") + JSON.stringify(config)).digest("hex").slice(0, 12);
   const suffix = `?v=${encodeURIComponent(String(version).slice(0, 40))}`;

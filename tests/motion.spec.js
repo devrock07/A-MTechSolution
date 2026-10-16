@@ -5,6 +5,7 @@ async function recordMotion(page) {
   await page.addInitScript(() => {
     window.motionRecords = [];
     window.entranceRecords = [];
+    window.arrivalDurations = [];
     const animate = Element.prototype.animate;
     Element.prototype.animate = function (...args) {
       const animation = animate.apply(this, args);
@@ -12,6 +13,9 @@ async function recordMotion(page) {
       return animation;
     };
     document.addEventListener("animationstart", event => window.entranceRecords.push(event.animationName));
+    document.addEventListener("animationstart", event => {
+      if (event.animationName === "brand-arrival") window.arrivalDurations.push(getComputedStyle(event.target).animationDuration);
+    });
   });
 }
 
@@ -28,6 +32,7 @@ test("brand entrance and arrival animate without blocking a navigation", async (
   await page.locator("#primary-navigation").getByRole("link", { name: "Solutions", exact: true }).click();
   await expect(page).toHaveURL(/\/solutions\/$/);
   await expect.poll(() => page.evaluate(() => window.entranceRecords)).toContain("brand-arrival");
+  expect(await page.evaluate(() => window.arrivalDurations)).toContain("1s");
   await expect(page.locator(".brand-entrance")).toBeHidden();
   await page.goBack();
   await expect(page.locator(".brand-entrance")).toBeHidden();

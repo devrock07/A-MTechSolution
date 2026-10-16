@@ -41,6 +41,7 @@ The browser suite starts its own three local fixtures on ports 4300–4302. Form
 | `src/app.js` | Progressive mobile menu behavior |
 | `src/contact.js` | Form validation, copying, and bounded delivery requests |
 | `src/motion.js` | Scroll reveals, entrance cleanup, and pointer-driven 3D tilt |
+| `src/motion-accents.js` | Desktop-only generated video, pause/replay, and lightweight mobile 2D entrance |
 | `src/solutions.js` | Accessible homepage concept and Solutions workflow selection |
 | `src/experience.js` | Service filters and local brief completion progress |
 | `src/styles.css` | Base presentation, accessible color tokens, and motion timings |
@@ -53,7 +54,7 @@ Complete and approve the relevant content before enabling `publishWork`, `publis
 
 ## Site design and motion
 
-The cream, charcoal, and lime design extends across the homepage, services, service details, Solutions, About, project planner, work and product previews, policy drafts, and the 404 page. Illustrations use editable HTML/CSS; there are no downloaded 3D models, video assets, or canvas libraries. All concept examples are clearly labeled as illustrations.
+The cream, charcoal, and lime design extends across the homepage, services, service details, Solutions, About, project planner, work and product previews, policy drafts, and the 404 page. Illustrations use editable HTML/CSS, enhanced on desktop by a small Higgsfield-generated 3D video accent. No 3D model or canvas library is shipped. All concept examples are clearly labeled as illustrations.
 
 - The homepage has three selectable concepts, a layered browser scene, floating workflow notes, expandable solution cards, and a six-step process grid.
 - Inner pages use dimensional introduction cards and consistent surface, type, spacing, and call-to-action styles. Selected service, capability, principle, product, and project-preview cards respond to pointer movement.
@@ -63,13 +64,16 @@ The cream, charcoal, and lime design extends across the homepage, services, serv
 
 Solutions retains its three selectable journeys, six expandable cards, linked service suggestions, and three-step starting guide. Shared cards and motion use the same implementation throughout the site.
 
-The A&M brand entrance plays once per tab session; subsequent pages have a short arrival curtain. Both are decorative, never lock scrolling or delay navigation, and are dismissed immediately by input. CSS completes the entrance even if the app script fails. Scroll reveals play once, with content visible by default when JavaScript or motion APIs are unavailable. Without JavaScript, all homepage concepts and workflow examples remain readable, every service stays visible, and the solution-card disclosures and policy anchors still work.
+The A&M brand entrance plays once per tab session (720ms); subsequent pages have a one-second arrival curtain. Both are decorative, never lock scrolling or delay navigation, and are dismissed immediately by input. CSS completes the entrance even if the app script fails. Scroll reveals play once, with content visible by default when JavaScript or motion APIs are unavailable. Without JavaScript, all homepage concepts and workflow examples remain readable, every service stays visible, and the solution-card disclosures and policy anchors still work.
+
+The existing homepage sculpture and inner-page hero graphic can play `public/media/studio-sculpture-v1.mp4`, created with Higgsfield / Seedance 2.5 (job `7796e97a-2f6d-4045-8a19-ec124052da27`). It is a silent, five-second 3D-rendered stack in the site's palette, approximately 435 KiB. It plays once at 0.8× speed with keyboard-accessible pause, play, and replay controls. Only an onscreen desktop illustration (at least 961px, fine pointer, hover, no reduced motion or data-saving preference) receives a video source. Hidden previews and background tabs pause playback. Phones and touch devices receive no video request or 3D model; the original CSS artwork has a one-second 2D fade-and-rise. Failed media and disabled JavaScript retain the original illustration.
 
 | Customize | Where |
 | --- | --- |
 | Main colors | `:root` tokens `--paper`, `--ink`, `--accent`, `--accent-dark` in `src/styles.css`; `--surface`, `--surface-line`, and `--surface-shadow` in `src/premium.css` |
 | Reveal timing | `--reveal-duration` and `--reveal-stagger` (milliseconds or seconds) |
 | Entrance and page arrival | `--entrance-duration` and `--arrival-duration` |
+| Generated desktop accent | `motionAccent()` in `src/pages.js`: replace the versioned MP4 path and adjust `data-motion-rate` (0.8 by default); layout, blending, and scale are at the end of `src/premium.css` |
 | Workflow switching and tilt return | `--workflow-switch-duration` and `--tilt-reset-duration` |
 | 3D depth | `--workflow-depth-step` in `src/styles.css`; `--scene-depth` in `src/premium.css`; perspective and resting angles in their scene rules |
 | Tilt strength | `data-tilt` in `src/pages.js`: degrees per axis, clamped to 0–10; 0 disables pointer tilt |

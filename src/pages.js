@@ -73,7 +73,7 @@ function interfaceVisual() {
       ${previews.map(([id, label, title, caption, heading, flow, note, detail], index) => `<section class="studio-board" id="studio-${id}" data-workflow-panel data-tilt="5" aria-labelledby="studio-title-${id}">
         <div class="studio-window"><span class="workflow-mark" aria-hidden="true">A&M</span><span class="page-code">Idea ${String(index + 1).padStart(2, "0")} / ${label}</span><span class="studio-dots" aria-hidden="true">•••</span></div>
         <div class="workflow-steps studio-content">
-          <div class="studio-canvas"><span class="studio-kicker">Built around your business</span><p class="studio-display">${heading}</p><span class="studio-mini-link">${flow}<span aria-hidden="true"> ↗</span></span><div class="studio-sculpture" aria-hidden="true"><i></i><i></i><i></i><span>↗</span></div></div>
+          <div class="studio-canvas"><span class="studio-kicker">Built around your business</span><p class="studio-display">${heading}</p><span class="studio-mini-link">${flow}<span aria-hidden="true"> ↗</span></span><div class="studio-sculpture" data-motion-accent><i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i><span aria-hidden="true">↗</span>${motionAccent()}</div></div>
           <div class="studio-floating"><span class="studio-check" aria-hidden="true">↗</span><div><strong>${note}</strong><span>${detail}</span></div><span class="workflow-signal" aria-hidden="true"></span></div>
           <div class="studio-caption"><h2 id="studio-title-${id}">${title}</h2><p>${caption}</p></div>
         </div>
@@ -85,7 +85,11 @@ function interfaceVisual() {
 }
 
 function depthMark() {
-  return `<div class="depth-mark" aria-hidden="true"><i></i><i></i><i><span>A&M</span><b>↗</b></i></div>`;
+  return `<div class="depth-mark" data-motion-accent><i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"><span>A&M</span><b>↗</b></i>${motionAccent()}</div>`;
+}
+
+function motionAccent() {
+  return `<video class="motion-accent-video" data-motion-src="${sitePath("/media/studio-sculpture-v1.mp4")}" data-motion-rate="0.8" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><button class="motion-accent-control" type="button" aria-label="Pause illustration" title="Pause illustration" hidden><span aria-hidden="true">Ⅱ</span></button>`;
 }
 
 function solutionCards() {

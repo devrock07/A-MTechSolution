@@ -18,7 +18,7 @@
   --reveal-duration: 550ms;
   --reveal-stagger: 70ms;
   --entrance-duration: 720ms;
-  --arrival-duration: 600ms;
+  --arrival-duration: 1000ms;
   --tilt-reset-duration: 320ms;
   --workflow-switch-duration: 280ms;
   --workflow-depth-step: 12px;
