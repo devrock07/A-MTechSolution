@@ -176,7 +176,7 @@ test.describe("without JavaScript", () => {
         await expect(page.locator("noscript .form-note")).toContainText("No information will be submitted");
       }
       await page.locator("#primary-navigation").getByRole("link", { name: "Services", exact: true }).click();
-      await expect(page.locator("h1")).toContainText("Technology shaped around the work");
+      await expect(page.locator("h1")).toContainText("Services for your business");
     });
   }
 });

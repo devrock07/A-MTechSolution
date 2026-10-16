@@ -23,7 +23,8 @@ test("homepage concepts switch by keyboard and retain an accessible selected sta
     await expect(page.locator(`#studio-${panel}`)).toBeVisible();
     await expect(page.getByRole("status")).toContainText("Preview shown");
   }
-  await expect(page.locator(".studio-display:visible")).toHaveCSS("font-size", /(?:3[2-9]|4[0-8])(?:\.\d+)?px/);
+  await expect(page.locator(".studio-display:visible")).toHaveText("A website that fits");
+  await expect(page.locator("#studio-presence .text-link")).toHaveAttribute("href", /\/services\/website-development\/$/);
   if (testInfo.project.name === "chromium") expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
