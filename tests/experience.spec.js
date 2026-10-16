@@ -1,6 +1,16 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+async function settleMotion(page, target) {
+  await target.scrollIntoViewIfNeeded();
+  await page.evaluate(async () => {
+    // IntersectionObserver can start a reveal on the frame after scrolling.
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await Promise.allSettled(document.getAnimations().map(animation => animation.finished));
+    await new Promise(resolve => requestAnimationFrame(resolve));
+  });
+}
+
 test("homepage concepts switch by keyboard and retain an accessible selected state", async ({ page }, testInfo) => {
   await page.goto("./");
   const controls = page.getByRole("group", { name: "Explore what we build" });
@@ -62,16 +72,13 @@ test("shared hero and card tilt reset on scroll, focus, and reduced motion", asy
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("./about/");
   const hero = page.locator(".page-hero-side");
+  await settleMotion(page, hero);
   await hero.hover({ position: { x: 50, y: 50 } });
   await expect(hero).toHaveClass(/is-tilting/);
   await page.mouse.wheel(0, 250);
   await expect(hero).not.toHaveClass(/is-tilting/);
   const card = page.locator(".principle-surface").first();
-  await card.scrollIntoViewIfNeeded();
-  await page.evaluate(async () => {
-    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    await Promise.allSettled(document.getAnimations().map(animation => animation.finished));
-  });
+  await settleMotion(page, card);
   await card.hover({ position: { x: 40, y: 40 } });
   await expect(card).toHaveClass(/is-tilting/);
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -81,11 +88,7 @@ test("shared hero and card tilt reset on scroll, focus, and reduced motion", asy
   await page.goto("./services/");
   await page.emulateMedia({ reducedMotion: "no-preference" });
   const service = page.locator(".service-catalog a").first();
-  await service.scrollIntoViewIfNeeded();
-  await page.evaluate(async () => {
-    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    await Promise.allSettled(document.getAnimations().map(animation => animation.finished));
-  });
+  await settleMotion(page, service);
   await service.hover({ position: { x: 40, y: 40 } });
   await expect(service).toHaveClass(/is-tilting/);
   await service.focus();
